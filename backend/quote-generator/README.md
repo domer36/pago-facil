@@ -25,6 +25,36 @@
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
+## Cotizaciones
+
+`POST /quotes` valida la solicitud y devuelve el calendario de pagos. Los valores
+monetarios de la respuesta se redondean a dos decimales; las tasas se expresan
+como decimales (por ejemplo, `0.35` equivale a 35% anual).
+
+```json
+{
+  "type": "arrendamiento",
+  "totalValue": 200000,
+  "downPaymentPercentage": 25,
+  "residualPercentage": 20,
+  "termMonths": 12
+}
+```
+
+`type` admite `credito-simple`, `arrendamiento` y `msi`. `residualPercentage`
+es obligatorio únicamente para arrendamiento. La respuesta incluye `payments`
+con `paymentNumber`, `payment`, `principal`, `interest` y `remainingBalance`,
+además de los totales y el residual separado (`residualPayment` es `null` para
+crédito simple y MSI). `remainingBalance` es el saldo amortizado neto del
+residual descontado y cierra en cero tras la última mensualidad. Las solicitudes
+inválidas responden con HTTP 400 y un mensaje de validación.
+
+La funcionalidad se organiza por feature en `src/features/quotes`: `domain/`
+contiene los tipos y el cálculo financiero sin dependencias de Nest,
+`application/` valida y coordina el caso de uso, y `presentation/` expone el
+endpoint HTTP. `quotes.module.ts` agrupa sus providers y controladores; `app.module.ts`
+ensambla los módulos de la aplicación.
+
 ## Project setup
 
 ```bash
