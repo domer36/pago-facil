@@ -1,5 +1,4 @@
-import { BadRequestException } from '@nestjs/common';
-import { QuoteService } from './quote.service.js';
+import { QuoteValidationError, QuoteService } from './quote.service.js';
 
 describe('QuoteService', () => {
   const service = new QuoteService();
@@ -140,7 +139,7 @@ describe('QuoteService', () => {
       },
     ],
   ])('rejects invalid input %#', (input) => {
-    expect(() => service.calculate(input)).toThrow(BadRequestException);
+    expect(() => service.calculate(input)).toThrow(QuoteValidationError);
   });
 
   it('returns the values and totals needed by the quote table', () => {
