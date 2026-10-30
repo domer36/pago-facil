@@ -1,20 +1,35 @@
 # Cotizador de financiamiento
 
-Aplicación local para cotizar crédito simple, arrendamiento y meses sin intereses.
-Docker Compose inicia el backend NestJS y el frontend Angular; Nginx sirve la
-interfaz en `http://localhost:4200` y reenvía `/quotes` al backend.
+Aplicación web en español para cotizar crédito simple, arrendamiento y meses sin
+intereses (MSI). El usuario ingresa los datos del financiamiento y obtiene una
+tabla de amortización; los cálculos y validaciones se realizan en el backend.
+
+## Desarrollo guiado por especificaciones (SDD)
+
+El proyecto utiliza **Spec Driven Development (SDD)**: primero se documentan el
+alcance y los requisitos en `specs/`, y luego se implementan mediante tareas
+asociadas a esa especificación. La especificación del cotizador está en
+[`specs/001-cotizador-de-financiamiento/spec.md`](specs/001-cotizador-de-financiamiento/spec.md).
+
+## Tecnologías
+
+- **Frontend:** Angular y TypeScript.
+- **Backend:** NestJS y TypeScript.
+- **Servidor web:** Nginx, que sirve la interfaz y reenvía las solicitudes al
+  backend.
+- **Contenedores:** Docker y Docker Compose.
 
 ## Iniciar la aplicación
 
-Desde la raíz del repositorio:
+Requiere Docker y Docker Compose. Desde la raíz del repositorio, ejecuta:
 
 ```bash
 docker compose up --build
 ```
 
-Abre `http://localhost:4200` y captura los datos de una cotización. La conexión
-se enruta internamente entre los servicios de Compose, sin configurar CORS ni
-exponer el puerto del backend al host.
+Abre [http://localhost:4200](http://localhost:4200) para usar el cotizador.
+Docker Compose inicia el backend y el frontend; Nginx enruta internamente las
+solicitudes al backend sin exponer su puerto al host.
 
 Para comprobar directamente el endpoint integrado desde otra terminal:
 
