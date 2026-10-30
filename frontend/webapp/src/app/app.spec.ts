@@ -3,16 +3,23 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import type { QuoteResponse } from './quote-api.service';
-import { App } from './app';
+import type { QuoteResponse } from './features/quote/domain/quote.models';
+import { QUOTE_GATEWAY } from './features/quote/application/quote-gateway.port';
+import { HttpQuoteGateway } from './features/quote/infrastructure/http-quote.gateway';
+import { QuotePageComponent } from './features/quote/presentation/quote-page.component';
 
-describe('App', () => {
+describe('QuotePageComponent', () => {
   let httpTesting: HttpTestingController;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [App],
-      providers: [provideHttpClient(), provideHttpClientTesting(), provideRouter([])],
+      imports: [QuotePageComponent],
+      providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        provideRouter([]),
+        { provide: QUOTE_GATEWAY, useClass: HttpQuoteGateway },
+      ],
     }).compileComponents();
     httpTesting = TestBed.inject(HttpTestingController);
   });
@@ -22,7 +29,7 @@ describe('App', () => {
   });
 
   it('offers the three financing types, exact terms, and residual only for leases', () => {
-    const fixture = TestBed.createComponent(App);
+    const fixture = TestBed.createComponent(QuotePageComponent);
     fixture.detectChanges();
     const host = fixture.nativeElement as HTMLElement;
 
@@ -44,7 +51,7 @@ describe('App', () => {
   });
 
   it('posts the lease request and presents the table, totals, and separate MXN residual', () => {
-    const fixture = TestBed.createComponent(App);
+    const fixture = TestBed.createComponent(QuotePageComponent);
     const component = fixture.componentInstance;
     component.form.setValue({
       type: 'arrendamiento',
@@ -88,7 +95,7 @@ describe('App', () => {
   });
 
   it('shows backend validation errors and removes any previous quote', () => {
-    const fixture = TestBed.createComponent(App);
+    const fixture = TestBed.createComponent(QuotePageComponent);
     const component = fixture.componentInstance;
     const form = fixture.nativeElement.querySelector('form') as HTMLFormElement;
     component.form.patchValue({ totalValue: 150_000 });

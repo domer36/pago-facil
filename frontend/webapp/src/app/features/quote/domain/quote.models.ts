@@ -1,7 +1,3 @@
-import { HttpClient } from '@angular/common/http';
-import { Injectable, inject } from '@angular/core';
-import type { Observable } from 'rxjs';
-
 export type QuoteType = 'credito-simple' | 'arrendamiento' | 'msi';
 
 export interface QuoteRequest {
@@ -32,13 +28,4 @@ export interface QuoteResponse {
   residualPayment: number | null;
   totalPaid: number;
   totalInterest: number;
-}
-
-@Injectable({ providedIn: 'root' })
-export class QuoteApiService {
-  private readonly http = inject(HttpClient);
-
-  create(request: QuoteRequest): Observable<QuoteResponse> {
-    return this.http.post<QuoteResponse>('/quotes', request);
-  }
 }
