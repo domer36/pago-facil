@@ -1,0 +1,255 @@
+:host {
+  display: block;
+  min-height: 100vh;
+}
+
+.page-shell {
+  width: min(1120px, calc(100% - 2rem));
+  margin: 0 auto;
+  padding: 3rem 0 4rem;
+}
+
+.page-header {
+  margin-bottom: 2rem;
+}
+
+.eyebrow {
+  margin: 0 0 0.6rem;
+  color: #167c69;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+
+h1,
+h2,
+p {
+  margin-top: 0;
+}
+
+h1 {
+  margin-bottom: 0.65rem;
+  color: #143b36;
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  letter-spacing: -0.045em;
+}
+
+h2 {
+  margin-bottom: 0;
+  color: #143b36;
+  font-size: 1.35rem;
+}
+
+.intro {
+  max-width: 42rem;
+  margin-bottom: 0;
+  color: #5d706b;
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+
+.calculator-card,
+.results-card {
+  margin-top: 1.5rem;
+  padding: clamp(1.25rem, 4vw, 2rem);
+  border: 1px solid #dfe9e5;
+  border-radius: 1.25rem;
+  background: #fff;
+  box-shadow: 0 18px 50px rgb(23 61 54 / 7%);
+}
+
+.section-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.75rem;
+}
+
+.currency-note,
+.result-type {
+  padding: 0.45rem 0.7rem;
+  border-radius: 999px;
+  background: #edf7f3;
+  color: #267466;
+  font-size: 0.8rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.25rem;
+}
+
+.field {
+  display: grid;
+  align-content: start;
+  gap: 0.5rem;
+  color: #283f3a;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.field input,
+.field select {
+  width: 100%;
+  min-height: 3rem;
+  padding: 0.7rem 0.85rem;
+  border: 1px solid #cbd9d4;
+  border-radius: 0.65rem;
+  background: #fff;
+  color: #213b35;
+  font: inherit;
+}
+
+.field input:focus,
+.field select:focus {
+  border-color: #16816e;
+  outline: 3px solid rgb(22 129 110 / 16%);
+}
+
+.field-error {
+  color: #aa312c;
+  font-size: 0.78rem;
+  font-weight: 500;
+}
+
+.form-hint {
+  margin: 1rem 0 1.25rem;
+  color: #65756f;
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+.error-message {
+  margin-bottom: 1rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid #f1c5c2;
+  border-radius: 0.65rem;
+  background: #fff2f1;
+  color: #942a25;
+  font-size: 0.9rem;
+}
+
+button {
+  min-height: 3rem;
+  padding: 0.75rem 1.2rem;
+  border: 0;
+  border-radius: 0.65rem;
+  background: #167c69;
+  color: #fff;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 750;
+  transition:
+    background 150ms ease,
+    transform 150ms ease;
+}
+
+button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  background: #106756;
+}
+
+button:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin: 0 0 1.5rem;
+}
+
+.summary-grid div {
+  padding: 1rem;
+  border-radius: 0.8rem;
+  background: #f3f8f6;
+}
+
+.summary-grid dt {
+  margin-bottom: 0.5rem;
+  color: #62736d;
+  font-size: 0.78rem;
+}
+
+.summary-grid dd {
+  margin: 0;
+  color: #173d36;
+  font-size: clamp(0.9rem, 2vw, 1.15rem);
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+  text-align: right;
+  white-space: nowrap;
+}
+
+caption {
+  padding: 0 0 0.75rem;
+  color: #26443d;
+  font-size: 0.95rem;
+  font-weight: 750;
+  text-align: left;
+}
+
+th,
+td {
+  padding: 0.85rem 0.75rem;
+  border-bottom: 1px solid #e7eeeb;
+}
+
+thead th {
+  background: #f3f8f6;
+  color: #52665f;
+  font-size: 0.76rem;
+}
+
+tbody th {
+  color: #334d45;
+}
+
+.residual-summary {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1rem;
+  padding: 1rem;
+  border: 1px solid #b9ddd2;
+  border-radius: 0.8rem;
+  background: #edf7f3;
+  color: #174b40;
+}
+
+@media (max-width: 720px) {
+  .page-shell {
+    width: min(100% - 1.25rem, 40rem);
+    padding-top: 2rem;
+  }
+
+  .summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 480px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .section-heading {
+    flex-direction: column;
+  }
+}
