@@ -2,6 +2,8 @@ import { Module } from '@nestjs/common';
 import { createObserveModule } from '@nestjs/observe';
 import { AppController } from './app.controller.js';
 import { AppService } from './app.service.js';
+import { QuoteController } from './quote.controller.js';
+import { QuoteService } from './quote.service.js';
 
 export const { ObserveModule, ObserveInstrument } = createObserveModule();
 
@@ -16,7 +18,7 @@ export const { ObserveModule, ObserveInstrument } = createObserveModule();
       serviceId: 'quote-generator',
     }),
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [AppController, QuoteController],
+  providers: [AppService, QuoteService],
 })
 export class AppModule {}

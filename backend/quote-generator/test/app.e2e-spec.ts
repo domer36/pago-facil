@@ -23,6 +23,40 @@ describe('AppController (e2e)', () => {
       .expect('Hello World!');
   });
 
+  it('creates a quote with a monthly schedule', () => {
+    return request(app.getHttpServer())
+      .post('/quotes')
+      .send({
+        type: 'msi',
+        totalValue: 100_000,
+        downPaymentPercentage: 0,
+        termMonths: 6,
+      })
+      .expect(201)
+      .expect(({ body }) => {
+        expect(body.payments).toHaveLength(6);
+        expect(body.totalInterest).toBe(0);
+        expect(body.payments.at(-1).remainingBalance).toBe(0);
+      });
+  });
+
+  it('rejects invalid quote requests', () => {
+    return request(app.getHttpServer())
+      .post('/quotes')
+      .send({
+        type: 'msi',
+        totalValue: 49_999,
+        downPaymentPercentage: 0,
+        termMonths: 6,
+      })
+      .expect(400)
+      .expect(({ body }) => {
+        expect(body.message).toContain(
+          'El monto financiado debe ser de al menos $50,000 MXN.',
+        );
+      });
+  });
+
   afterEach(async () => {
     await app.close();
   });

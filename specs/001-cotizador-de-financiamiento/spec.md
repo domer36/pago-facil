@@ -1,5 +1,5 @@
 Name: 001 Cotizador de Financiamiento
-Status: Approved
+Status: In progress
 Date: 2026-10-29 21:36
 
 ## Description
