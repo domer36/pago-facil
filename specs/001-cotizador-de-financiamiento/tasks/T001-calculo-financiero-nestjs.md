@@ -2,7 +2,7 @@ Type: task
 ID: T001
 Name: Implementar cálculo financiero en NestJS
 Spec: 001-cotizador-de-financiamiento
-Status: in review
+Status: Completed
 Date: 2026-10-30 13:19
 Branch: task/001-t001-calculo-financiero-nestjs
 Depends on: -
