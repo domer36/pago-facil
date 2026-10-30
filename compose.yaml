@@ -1,0 +1,16 @@
+services:
+  backend:
+    build:
+      context: ./backend/quote-generator
+    environment:
+      PORT: 3000
+    expose:
+      - "3000"
+
+  frontend:
+    build:
+      context: ./frontend/webapp
+    depends_on:
+      - backend
+    ports:
+      - "4200:80"
