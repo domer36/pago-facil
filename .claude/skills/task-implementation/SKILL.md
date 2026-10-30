@@ -27,6 +27,12 @@ specs/NNN-slug/
                            Depends on, Covers; sections: Description, To do, Test
 ```
 
+For services and application features, organize code feature-first and split each feature by layer. In this repository, the backend pattern is `src/features/<feature>/{domain,application,presentation}`; add an `infrastructure` layer only when the feature needs external adapters such as persistence or remote APIs. Keep a feature's files together instead of grouping the whole application into global folders by technical type.
+
+Maintain clean-architecture boundaries: presentation handles transport and input/output mapping, application coordinates use cases, domain owns business rules, and infrastructure implements external integrations. Dependencies point inward; domain must not depend on NestJS, HTTP, databases, or infrastructure. Use dependency injection and ports/interfaces where they protect the inner layers from implementation details. Apply SOLID proportionately: each class/module has one clear responsibility (SRP); extend behavior through focused abstractions instead of changing unrelated behavior (OCP); implementations remain substitutable for their contracts (LSP); keep interfaces small and client-focused (ISP); and make high-level policy depend on abstractions rather than implementation details (DIP). Avoid adding abstractions without a concrete need.
+
+Before creating or moving files, inspect nearby features and follow their established naming, module, testing, and framework conventions. Keep new work within the task's feature and scope; do not reorganize unrelated or existing files just to impose this structure. If the task or current architecture conflicts with these boundaries, preserve existing behavior and explain the necessary deviation.
+
 Task statuses: `pending` → `in progress` → `in review` → `completed`.
 - `in progress`: set by this skill when it starts.
 - `in review`: set by this skill when the implementation is finished locally and waits for the user's validation.
@@ -63,10 +69,12 @@ Set the task's `Status: in progress`. If the spec is `Approved`, set the spec's 
 
 1. Follow the task's *To do* steps in order, doing only what the task and its *Description* describe.
 2. Respect the spec's *Technical notes* and *Out of scope*.
-3. Tick each *To do* checkbox (`- [x]`) as it is actually done.
-4. If something needed is missing, ambiguous, or would require changing the spec or another task, stop, explain, and ask the user. Do not guess and do not expand the scope.
-5. Do not add dependencies or files unrelated to the task without telling the user why.
-6. Tick a *Test* checkbox **only** if you really verified it (ran the test suite, ran the command, inspected the output). Checks that need a human (visual inspection, subjective behavior, external services) stay unchecked and are listed for the user.
+3. When implementing a service or feature, keep its code organized feature-first and separate responsibilities by layer, following *Project conventions*. Check the neighboring code first; do not introduce a parallel architecture or move unrelated code.
+4. Keep responsibilities focused and dependencies directed toward the domain. Do not put business rules in controllers, transport handlers, or infrastructure adapters; avoid monolithic services and abstractions that have no concrete use.
+5. Tick each *To do* checkbox (`- [x]`) as it is actually done.
+6. If something needed is missing, ambiguous, or would require changing the spec or another task, stop, explain, and ask the user. Do not guess and do not expand the scope.
+7. Do not add dependencies or files unrelated to the task without telling the user why.
+8. Tick a *Test* checkbox **only** if you really verified it (ran the test suite, ran the command, inspected the output). Checks that need a human (visual inspection, subjective behavior, external services) stay unchecked and are listed for the user.
 
 ### 6. Finish
 
