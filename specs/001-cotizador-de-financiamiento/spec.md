@@ -43,12 +43,12 @@ Aplicación web en español para cotizar crédito simple, arrendamiento y meses 
 
 ## Technical notes
 Aplicación web con frontend y backend; todos los cálculos financieros deben ejecutarse en el backend. Tasas anuales nominales fijas: 35% para crédito simple, 27% para arrendamiento y 0% para MSI; la tasa mensual se obtiene dividiendo la tasa anual entre 12. Para pagos fijos con tasa mensual positiva y valor residual futuro, el pago periódico debe amortizar el valor presente financiado menos el valor presente del residual. Moneda: MXN. La aplicación no requiere autenticación, persistencia ni integraciones externas. Debe ejecutarse con Docker Compose.
+El backend existente está en `backend/quote-generator` y usa NestJS. El frontend existente está en `frontend/webapp` y usa Angular.
 
 ## Open questions
-- Selección de lenguaje, framework y tecnologías concretas para frontend y backend.
+- Ninguna.
 
-## Proposed tasks
-Outline only; the task files are created later by create-tasks.
-- T001 - Implementar cálculo financiero: calcular y validar crédito simple, arrendamiento y MSI en el backend, con pruebas de reglas y redondeo.
-- T002 - Crear interfaz del cotizador: capturar entradas, mostrar validaciones y presentar la tabla de amortización y sus totales.
-- T003 - Preparar ejecución local: configurar Docker Compose y verificar el inicio integrado de frontend y backend.
+## Tasks
+- [ ] [T001 - Implementar cálculo financiero en NestJS](tasks/T001-calculo-financiero-nestjs.md)
+- [ ] [T002 - Implementar interfaz Angular del cotizador](tasks/T002-interfaz-angular-cotizador.md)
+- [ ] [T003 - Integrar la aplicación con Docker Compose](tasks/T003-integracion-docker-compose.md)
