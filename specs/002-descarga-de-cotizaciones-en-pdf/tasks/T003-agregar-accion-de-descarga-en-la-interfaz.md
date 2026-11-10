@@ -2,7 +2,7 @@ Type: task
 ID: T003
 Name: Agregar acción de descarga en la interfaz
 Spec: 002-descarga-de-cotizaciones-en-pdf
-Status: in review
+Status: Completed
 Date: 2026-11-09 18:16
 Branch: task/002-t003-agregar-accion-de-descarga-en-la-interfaz
 Depends on: T001, T002
