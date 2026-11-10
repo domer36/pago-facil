@@ -2,7 +2,7 @@ Type: task
 ID: T005
 Name: Validar integración de persistencia
 Spec: 003-persistencia-de-cotizaciones-y-prospectos
-Status: done
+Status: Completed
 Date: 2026-11-10 09:56
 Branch: task/003-t005-validar-integracion-de-persistencia
 Depends on: T001, T002, T003, T004
