@@ -2,7 +2,7 @@ Type: task
 ID: T003
 Name: Persistir cotizaciones
 Spec: 003-persistencia-de-cotizaciones-y-prospectos
-Status: in review
+Status: Completed
 Date: 2026-11-10 09:56
 Branch: task/003-t003-persistir-cotizaciones
 Depends on: T001, T002
