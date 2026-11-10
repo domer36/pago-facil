@@ -42,8 +42,8 @@ El proyecto dispone de `backend/pdf-generator` para el servicio generador de PDF
 ## Open questions
 - Ninguna sobre el alcance funcional. El nombre del archivo y los detalles del contrato HTTP se definirán durante la implementación.
 
-## Proposed tasks
-Outline only; the task files are created later by create-tasks.
-- T001 - Implementar generación del PDF: Preparar el servicio PDF para recibir una cotización calculada y generar el documento con los datos requeridos.
-- T002 - Integrar descarga en la interfaz: Agregar la acción de descarga y manejar exitosamente los errores y reintentos.
-- T003 - Integrar servicio PDF en Docker Compose: Incorporar el servicio al entorno local y verificar la comunicación con la interfaz.
+## Tasks
+- [ ] [T001 - Preparar contrato y estructura del servicio PDF](tasks/T001-preparar-contrato-y-estructura-del-servicio-pdf.md)
+- [ ] [T002 - Generar contenido del PDF con tabla de amortización](tasks/T002-generar-contenido-del-pdf.md)
+- [ ] [T003 - Agregar acción de descarga en la interfaz](tasks/T003-agregar-accion-de-descarga-en-la-interfaz.md)
+- [ ] [T004 - Integrar servicio PDF en Docker Compose](tasks/T004-integrar-servicio-pdf-en-docker-compose.md)
