@@ -2,10 +2,12 @@ import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { QuoteResponse } from './features/quote/domain/quote.models';
 import { QUOTE_GATEWAY } from './features/quote/application/quote-gateway.port';
+import { QUOTE_DOCUMENT_GATEWAY } from './features/quote/application/quote-document-gateway.port';
 import { HttpQuoteGateway } from './features/quote/infrastructure/http-quote.gateway';
+import { HttpQuoteDocumentGateway } from './features/quote/infrastructure/http-quote-document.gateway';
 import { QuotePageComponent } from './features/quote/presentation/quote-page.component';
 
 describe('QuotePageComponent', () => {
@@ -19,6 +21,7 @@ describe('QuotePageComponent', () => {
         provideHttpClientTesting(),
         provideRouter([]),
         { provide: QUOTE_GATEWAY, useClass: HttpQuoteGateway },
+        { provide: QUOTE_DOCUMENT_GATEWAY, useClass: HttpQuoteDocumentGateway },
       ],
     }).compileComponents();
     httpTesting = TestBed.inject(HttpTestingController);
@@ -26,6 +29,8 @@ describe('QuotePageComponent', () => {
 
   afterEach(() => {
     httpTesting.verify();
+    vi.restoreAllMocks();
+    vi.unstubAllGlobals();
   });
 
   it('offers the three financing types, exact terms, and residual only for leases', () => {
@@ -33,6 +38,7 @@ describe('QuotePageComponent', () => {
     fixture.detectChanges();
     const host = fixture.nativeElement as HTMLElement;
 
+    expect(host.querySelector('.download-button')).toBeNull();
     expect(host.querySelectorAll('select[formControlName="type"] option')).toHaveLength(3);
     expect(host.querySelector('input[formControlName="residualPercentage"]')).toBeNull();
     expect(
@@ -48,6 +54,76 @@ describe('QuotePageComponent', () => {
     fixture.componentInstance.form.controls.type.setValue('msi');
     fixture.detectChanges();
     expect(host.querySelector('input[formControlName="residualPercentage"]')).toBeNull();
+  });
+
+  it('posts the quote to the PDF service and starts a direct browser download', () => {
+    const fixture = TestBed.createComponent(QuotePageComponent);
+    const quote = createQuote('credito-simple', null);
+    fixture.componentInstance.quote.set(quote);
+    fixture.detectChanges();
+
+    vi.stubGlobal('URL', {
+      createObjectURL: vi.fn().mockReturnValue('blob:cotizacion'),
+      revokeObjectURL: vi.fn(),
+    });
+    const clickedLinks: HTMLAnchorElement[] = [];
+    vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(function (
+      this: HTMLAnchorElement,
+    ) {
+      clickedLinks.push(this);
+    });
+    (fixture.nativeElement as HTMLElement)
+      .querySelector('.download-button')!
+      .dispatchEvent(new Event('click', { bubbles: true }));
+
+    const request = httpTesting.expectOne('/documents/quote');
+    expect(request.request.method).toBe('POST');
+    expect(request.request.responseType).toBe('blob');
+    expect(request.request.body).toEqual(quote);
+    request.flush(new Blob(['PDF'], { type: 'application/pdf' }));
+    fixture.detectChanges();
+
+    expect(clickedLinks).toHaveLength(1);
+    expect(clickedLinks[0].download).toBe('cotizacion.pdf');
+    expect(clickedLinks[0].href).toBe('blob:cotizacion');
+    expect(fixture.nativeElement.querySelector('.download-error')).toBeNull();
+  });
+
+  it('keeps the quote visible and allows retry after a PDF download failure', () => {
+    const fixture = TestBed.createComponent(QuotePageComponent);
+    const quote = createQuote('credito-simple', null);
+    fixture.componentInstance.quote.set(quote);
+    fixture.detectChanges();
+
+    const button = (fixture.nativeElement as HTMLElement).querySelector(
+      '.download-button',
+    ) as HTMLButtonElement;
+    button.click();
+    httpTesting
+      .expectOne('/documents/quote')
+      .flush(new Blob(['{"message":"Error interno"}'], { type: 'application/json' }), {
+        status: 500,
+        statusText: 'Server Error',
+      });
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelector('.results-card')).not.toBeNull();
+    expect(fixture.nativeElement.querySelector('[role="alert"]')?.textContent).toContain(
+      'No fue posible descargar el PDF de la cotización. Intenta de nuevo.',
+    );
+    expect(button.disabled).toBe(false);
+
+    vi.stubGlobal('URL', {
+      createObjectURL: vi.fn().mockReturnValue('blob:cotizacion'),
+      revokeObjectURL: vi.fn(),
+    });
+    vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => undefined);
+    button.click();
+    httpTesting.expectOne('/documents/quote').flush(new Blob(['PDF'], { type: 'application/pdf' }));
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelector('.results-card')).not.toBeNull();
+    expect(fixture.nativeElement.querySelector('.download-error')).toBeNull();
   });
 
   it('posts the lease request and presents the table, totals, and separate MXN residual', () => {

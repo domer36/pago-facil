@@ -181,6 +181,18 @@
           </strong>
         </div>
       }
+
+      <button
+        class="download-button"
+        type="button"
+        [disabled]="isDownloadingPdf()"
+        (click)="downloadPdf()"
+      >
+        {{ isDownloadingPdf() ? 'Preparando PDF…' : 'Descargar cotización en PDF' }}
+      </button>
+      @if (downloadErrorMessage()) {
+        <div class="error-message download-error" role="alert">{{ downloadErrorMessage() }}</div>
+      }
     </section>
   }
 </main>
