@@ -2,7 +2,7 @@ Type: task
 ID: T004
 Name: Integrar prospectos y guardado en la interfaz
 Spec: 003-persistencia-de-cotizaciones-y-prospectos
-Status: pending
+Status: Completed
 Date: 2026-11-10 09:56
 Branch: task/003-t004-integrar-prospectos-y-guardado-en-la-interfaz
 Depends on: T002, T003
