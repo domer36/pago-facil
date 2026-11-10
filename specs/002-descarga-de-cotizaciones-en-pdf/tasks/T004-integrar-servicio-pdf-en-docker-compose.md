@@ -2,7 +2,7 @@ Type: task
 ID: T004
 Name: Integrar servicio PDF en Docker Compose
 Spec: 002-descarga-de-cotizaciones-en-pdf
-Status: in review
+Status: Completed
 Date: 2026-11-09 18:16
 Branch: task/002-t004-integrar-servicio-pdf-en-docker-compose
 Depends on: T001
