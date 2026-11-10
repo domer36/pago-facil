@@ -21,11 +21,11 @@ export class QuoteValidationError extends Error {
 
 export class QuoteService {
   calculate(input: unknown): QuoteResponse {
-    return calculateQuote(validateRequest(input));
+    return calculateQuote(parseQuoteRequest(input));
   }
 }
 
-function validateRequest(input: unknown): QuoteRequest {
+export function parseQuoteRequest(input: unknown): QuoteRequest {
   if (typeof input !== 'object' || input === null || Array.isArray(input)) {
     throw new QuoteValidationError('La solicitud debe ser un objeto JSON.');
   }

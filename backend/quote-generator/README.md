@@ -49,11 +49,20 @@ crédito simple y MSI). `remainingBalance` es el saldo amortizado neto del
 residual descontado y cierra en cero tras la última mensualidad. Las solicitudes
 inválidas responden con HTTP 400 y un mensaje de validación.
 
+Para guardar explícitamente una cotización calculada, envía `POST /quotes/saved`
+con `prospectId`, el objeto original `input` enviado a `POST /quotes` y el objeto
+completo `result` devuelto por ese cálculo, incluida su tabla `payments`. Esta
+operación no recalcula la cotización y solo guarda el registro si el prospecto
+existe y está activo; devuelve el identificador de la cotización guardada y sus
+datos persistidos. Un prospecto inexistente o inactivo responde HTTP 404. La
+cotización solo se inserta: no hay operaciones para modificarla o eliminarla.
+
 La funcionalidad se organiza por feature en `src/features/quotes`: `domain/`
 contiene los tipos y el cálculo financiero sin dependencias de Nest,
 `application/` valida y coordina el caso de uso, y `presentation/` expone el
-endpoint HTTP. `quotes.module.ts` agrupa sus providers y controladores; `app.module.ts`
-ensambla los módulos de la aplicación.
+endpoint HTTP; `infrastructure/` contiene el adaptador de PostgreSQL. `quotes.module.ts`
+agrupa sus providers y controladores; `app.module.ts` ensambla los módulos de la
+aplicación.
 
 ## Project setup
 
