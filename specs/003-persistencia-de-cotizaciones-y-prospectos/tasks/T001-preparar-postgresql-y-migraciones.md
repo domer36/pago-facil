@@ -2,7 +2,7 @@ Type: task
 ID: T001
 Name: Preparar PostgreSQL y migraciones
 Spec: 003-persistencia-de-cotizaciones-y-prospectos
-Status: in review
+Status: Completed
 Date: 2026-11-10 09:56
 Branch: task/003-t001-preparar-postgresql-y-migraciones
 Depends on: -
