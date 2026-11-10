@@ -29,3 +29,27 @@ export interface QuoteResponse {
   totalPaid: number;
   totalInterest: number;
 }
+
+export interface Prospect {
+  id: string;
+  fullName: string;
+  phone: string;
+  email: string;
+  active: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface SaveQuoteRequest {
+  prospectId: string;
+  input: QuoteRequest;
+  result: QuoteResponse;
+}
+
+export interface SavedQuote {
+  id: string;
+  prospectId: string;
+  inputPayload: QuoteRequest;
+  resultPayload: QuoteResponse;
+  createdAt: string;
+}

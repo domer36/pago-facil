@@ -123,14 +123,113 @@ h2 {
   line-height: 1.5;
 }
 
-.error-message {
+.save-panel {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e3efe9;
+}
+
+.save-heading {
+  margin-bottom: 1rem;
+}
+
+.selection-pill {
+  padding: 0.45rem 0.7rem;
+  border-radius: 999px;
+  background: #edf7f3;
+  color: #267466;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.search-row {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.search-row input {
+  flex: 1;
+}
+
+.prospect-list {
+  display: grid;
+  gap: 0.75rem;
+  margin: 1rem 0;
+}
+
+.prospect-option {
+  display: grid;
+  width: 100%;
+  padding: 0.85rem 1rem;
+  border: 1px solid #dfe9e5;
+  border-radius: 0.8rem;
+  background: #f7faf9;
+  color: #173d36;
+  text-align: left;
+}
+
+.prospect-option strong,
+.prospect-option span,
+.prospect-option small {
+  display: block;
+}
+
+.prospect-option span {
+  margin-top: 0.2rem;
+  color: #4b5f5a;
+}
+
+.prospect-option small {
+  margin-top: 0.25rem;
+  color: #56726b;
+}
+
+.prospect-option.selected {
+  border-color: #167c69;
+  background: #edf7f3;
+}
+
+.empty-state,
+.selected-prospect {
+  margin: 0.75rem 0 0;
+  color: #45615b;
+  font-size: 0.88rem;
+}
+
+.prospect-form {
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  border-top: 1px dashed #dce9e5;
+}
+
+.prospect-form h3 {
+  margin-bottom: 1rem;
+  color: #143b36;
+  font-size: 1.05rem;
+}
+
+.inline-grid {
+  margin-bottom: 1rem;
+}
+
+.error-message,
+.success-message {
   margin-bottom: 1rem;
   padding: 0.85rem 1rem;
-  border: 1px solid #f1c5c2;
   border-radius: 0.65rem;
+  font-size: 0.9rem;
+}
+
+.error-message {
+  border: 1px solid #f1c5c2;
   background: #fff2f1;
   color: #942a25;
-  font-size: 0.9rem;
+}
+
+.success-message {
+  border: 1px solid #b9ddd2;
+  background: #edf7f3;
+  color: #1d5a4a;
 }
 
 button {
@@ -148,9 +247,26 @@ button {
     transform 150ms ease;
 }
 
+.secondary-button,
+.save-button {
+  min-width: 12rem;
+}
+
+.secondary-button {
+  background: #1f8a7a;
+}
+
+.save-button {
+  margin-top: 0.5rem;
+}
+
 button:hover:not(:disabled) {
   transform: translateY(-1px);
   background: #106756;
+}
+
+.secondary-button:hover:not(:disabled) {
+  background: #12715e;
 }
 
 button:disabled {
