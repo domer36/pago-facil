@@ -15,8 +15,9 @@ asociadas a esa especificación. La especificación del cotizador está en
 
 - **Frontend:** Angular y TypeScript.
 - **Backend:** NestJS y TypeScript.
+- **Servicio PDF:** NestJS y TypeScript.
 - **Servidor web:** Nginx, que sirve la interfaz y reenvía las solicitudes al
-  backend.
+  backend de cotizaciones y al servicio PDF.
 - **Contenedores:** Docker y Docker Compose.
 
 ## Iniciar la aplicación
@@ -28,8 +29,9 @@ docker compose up --build
 ```
 
 Abre [http://localhost:4200](http://localhost:4200) para usar el cotizador.
-Docker Compose inicia el backend y el frontend; Nginx enruta internamente las
-solicitudes al backend sin exponer su puerto al host.
+Docker Compose inicia el backend, el servicio PDF y el frontend. Nginx enruta
+internamente las solicitudes de cotización al backend y las solicitudes de
+documentos al servicio PDF; ninguno de estos servicios expone su puerto al host.
 
 Para comprobar directamente el endpoint integrado desde otra terminal:
 

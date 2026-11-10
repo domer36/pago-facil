@@ -7,10 +7,19 @@ services:
     expose:
       - "3000"
 
+  pdf-generator:
+    build:
+      context: ./backend/pdf-generator
+    environment:
+      PORT: 3000
+    expose:
+      - "3000"
+
   frontend:
     build:
       context: ./frontend/webapp
     depends_on:
       - backend
+      - pdf-generator
     ports:
       - "4200:80"
