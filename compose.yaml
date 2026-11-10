@@ -1,11 +1,73 @@
 services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-appdb}
+      POSTGRES_USER: ${POSTGRES_USER:-appuser}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-app_password}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-appuser} -d ${POSTGRES_DB:-appdb}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+
+  flyway:
+    image: flyway/flyway:11-alpine
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      FLYWAY_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-appdb}
+      FLYWAY_USER: ${POSTGRES_USER:-appuser}
+      FLYWAY_PASSWORD: ${POSTGRES_PASSWORD:-app_password}
+      FLYWAY_CONNECT_RETRIES: 30
+      FLYWAY_LOCATIONS: filesystem:/flyway/sql
+    volumes:
+      - ./database/migrations:/flyway/sql
+    command: -connectRetries=30 migrate
+
   backend:
     build:
       context: ./backend/quote-generator
+    depends_on:
+      postgres:
+        condition: service_healthy
+      flyway:
+        condition: service_completed_successfully
     environment:
       PORT: 3000
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: ${POSTGRES_DB:-appdb}
+      DB_USER: ${POSTGRES_USER:-appuser}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-app_password}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-appuser}:${POSTGRES_PASSWORD:-app_password}@postgres:5432/${POSTGRES_DB:-appdb}
     expose:
       - "3000"
+
+  customers:
+    build:
+      context: ./backend/customers
+    depends_on:
+      postgres:
+        condition: service_healthy
+      flyway:
+        condition: service_completed_successfully
+    environment:
+      PORT: 3001
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: ${POSTGRES_DB:-appdb}
+      DB_USER: ${POSTGRES_USER:-appuser}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-app_password}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-appuser}:${POSTGRES_PASSWORD:-app_password}@postgres:5432/${POSTGRES_DB:-appdb}
+    ports:
+      - "3001:3001"
 
   pdf-generator:
     build:
@@ -20,6 +82,10 @@ services:
       context: ./frontend/webapp
     depends_on:
       - backend
+      - customers
       - pdf-generator
     ports:
       - "4200:80"
+
+volumes:
+  postgres_data:
