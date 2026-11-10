@@ -2,7 +2,7 @@ Type: task
 ID: T002
 Name: Implementación del catálogo de prospectos
 Spec: 003-persistencia-de-cotizaciones-y-prospectos
-Status: in review
+Status: Completed
 Date: 2026-11-10 09:56
 Branch: task/003-t002-implementacion-de-catalogo-de-prospectos
 Depends on: T001
