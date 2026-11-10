@@ -25,6 +25,14 @@
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
+## API de cotizaciones
+
+`POST /documents/quote` recibe en el cuerpo JSON la respuesta completa devuelta
+por `POST /quotes` del servicio de cotizaciones. Una respuesta valida produce
+un archivo `application/pdf` descargable con nombre `cotizacion.pdf`. El
+generador valida la estructura recibida y conserva los valores financieros;
+no vuelve a calcularlos.
+
 ## Project setup
 
 ```bash
