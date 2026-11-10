@@ -2,7 +2,7 @@ Type: task
 ID: T002
 Name: Generar contenido del PDF con tabla de amortización
 Spec: 002-descarga-de-cotizaciones-en-pdf
-Status: in review
+Status: Completed
 Date: 2026-11-09 18:16
 Branch: task/002-t002-generar-contenido-del-pdf
 Depends on: T001
