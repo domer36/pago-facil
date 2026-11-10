@@ -2,7 +2,7 @@ Type: task
 ID: T001
 Name: Preparar contrato y estructura del servicio PDF
 Spec: 002-descarga-de-cotizaciones-en-pdf
-Status: in review
+Status: Completed
 Date: 2026-11-09 18:16
 Branch: task/002-t001-preparar-contrato-y-estructura-del-servicio-pdf
 Depends on: -
