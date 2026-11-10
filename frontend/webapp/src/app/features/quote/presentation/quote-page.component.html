@@ -182,6 +182,107 @@
         </div>
       }
 
+      <div class="save-panel">
+        <div class="section-heading save-heading">
+          <div>
+            <p class="eyebrow">PROSPECTO Y GUARDADO</p>
+            <h2>Asocia la cotización a un prospecto</h2>
+          </div>
+          @if (selectedProspect(); as selected) {
+            <span class="selection-pill">{{ selected.fullName }}</span>
+          }
+        </div>
+
+        <div class="field">
+          <span>Buscar prospecto activo</span>
+          <div class="search-row">
+            <input
+              type="search"
+              [formControl]="prospectSearchControl"
+              placeholder="Nombre, teléfono o correo"
+              aria-label="Buscar prospecto"
+            />
+            <button class="secondary-button" type="button" [disabled]="isSearchingProspects()" (click)="searchProspects()">
+              {{ isSearchingProspects() ? 'Buscando…' : 'Buscar' }}
+            </button>
+          </div>
+        </div>
+
+        @if (prospects().length > 0) {
+          <div class="prospect-list" role="listbox" aria-label="Prospectos activos">
+            @for (prospect of prospects(); track prospect.id) {
+              <button
+                class="prospect-option"
+                type="button"
+                [class.selected]="selectedProspect()?.id === prospect.id"
+                (click)="selectProspect(prospect)"
+              >
+                <strong>{{ prospect.fullName }}</strong>
+                <span>{{ prospect.phone }}</span>
+                <small>{{ prospect.email }}</small>
+              </button>
+            }
+          </div>
+        } @else if (!isSearchingProspects() && prospectSearchControl.value.trim()) {
+          <p class="empty-state">No se encontraron prospectos activos para esa búsqueda.</p>
+        }
+
+        @if (selectedProspect(); as selected) {
+          <p class="selected-prospect">
+            Prospecto seleccionado: <strong>{{ selected.fullName }}</strong> · {{ selected.email }}
+          </p>
+        }
+
+        @if (prospectErrorMessage()) {
+          <div class="error-message" role="alert">{{ prospectErrorMessage() }}</div>
+        }
+
+        <form class="prospect-form" [formGroup]="prospectForm" (ngSubmit)="createProspect()" novalidate>
+          <h3>Registrar nuevo prospecto</h3>
+          <div class="form-grid inline-grid">
+            <label class="field">
+              <span>Nombre</span>
+              <input type="text" formControlName="fullName" placeholder="Nombre completo" />
+              @if (prospectForm.controls.fullName.touched && prospectForm.controls.fullName.invalid) {
+                <small class="field-error">El nombre es obligatorio.</small>
+              }
+            </label>
+
+            <label class="field">
+              <span>Teléfono</span>
+              <input type="tel" formControlName="phone" placeholder="Ej. 5512345678" />
+              @if (prospectForm.controls.phone.touched && prospectForm.controls.phone.invalid) {
+                <small class="field-error">El teléfono es obligatorio.</small>
+              }
+            </label>
+
+            <label class="field">
+              <span>Correo electrónico</span>
+              <input type="email" formControlName="email" placeholder="correo@ejemplo.com" />
+              @if (prospectForm.controls.email.touched && prospectForm.controls.email.invalid) {
+                <small class="field-error">Ingresa un correo válido.</small>
+              }
+            </label>
+          </div>
+
+          <button class="secondary-button" type="submit" [disabled]="isCreatingProspect()">
+            {{ isCreatingProspect() ? 'Registrando…' : 'Registrar prospecto' }}
+          </button>
+        </form>
+
+        @if (saveErrorMessage()) {
+          <div class="error-message" role="alert">{{ saveErrorMessage() }}</div>
+        }
+
+        @if (saveSuccessMessage()) {
+          <div class="success-message" role="status">{{ saveSuccessMessage() }}</div>
+        }
+
+        <button class="save-button" type="button" [disabled]="isSavingQuote() || !selectedProspect()" (click)="saveQuote()">
+          {{ isSavingQuote() ? 'Guardando cotización…' : 'Guardar cotización' }}
+        </button>
+      </div>
+
       <button
         class="download-button"
         type="button"

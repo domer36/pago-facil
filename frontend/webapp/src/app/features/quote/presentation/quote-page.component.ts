@@ -1,9 +1,16 @@
 import { CurrencyPipe, registerLocaleData } from '@angular/common';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import localeEsMx from '@angular/common/locales/es-MX';
 import { Component, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import type { QuoteRequest, QuoteResponse, QuoteType } from '../domain/quote.models';
+import type {
+  Prospect,
+  QuoteRequest,
+  QuoteResponse,
+  QuoteType,
+  SaveQuoteRequest,
+} from '../domain/quote.models';
 import { CreateQuote } from '../application/create-quote.use-case';
 import { DownloadQuotePdf } from '../application/download-quote-pdf.use-case';
 
@@ -28,13 +35,37 @@ export class QuotePageComponent {
     termMonths: new FormControl<number>(6, { nonNullable: true }),
     residualPercentage: new FormControl<number | null>(null),
   });
+  readonly prospectSearchControl = new FormControl('', { nonNullable: true });
+  readonly prospectForm = new FormGroup({
+    fullName: new FormControl('', {
+      nonNullable: true,
+      validators: [Validators.required, Validators.maxLength(255)],
+    }),
+    phone: new FormControl('', {
+      nonNullable: true,
+      validators: [Validators.required, Validators.maxLength(50)],
+    }),
+    email: new FormControl('', {
+      nonNullable: true,
+      validators: [Validators.required, Validators.maxLength(255), Validators.email],
+    }),
+  });
 
   readonly quote = signal<QuoteResponse | null>(null);
+  readonly prospects = signal<Prospect[]>([]);
+  readonly selectedProspect = signal<Prospect | null>(null);
   readonly errorMessage = signal('');
+  readonly prospectErrorMessage = signal('');
+  readonly saveErrorMessage = signal('');
+  readonly saveSuccessMessage = signal('');
   readonly downloadErrorMessage = signal('');
   readonly isSubmitting = signal(false);
+  readonly isSearchingProspects = signal(false);
+  readonly isCreatingProspect = signal(false);
+  readonly isSavingQuote = signal(false);
   readonly isDownloadingPdf = signal(false);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly http = inject(HttpClient);
 
   constructor(
     private readonly createQuote: CreateQuote,
@@ -51,6 +82,8 @@ export class QuotePageComponent {
       residualControl.updateValueAndValidity({ emitEvent: false });
       this.quote.set(null);
       this.errorMessage.set('');
+      this.saveErrorMessage.set('');
+      this.saveSuccessMessage.set('');
       this.downloadErrorMessage.set('');
     });
   }
@@ -58,35 +91,15 @@ export class QuotePageComponent {
   submit(): void {
     this.quote.set(null);
     this.errorMessage.set('');
+    this.saveErrorMessage.set('');
+    this.saveSuccessMessage.set('');
     this.downloadErrorMessage.set('');
 
-    if (this.form.invalid) {
+    const request = this.buildQuoteRequestFromForm();
+    if (!request) {
       this.form.markAllAsTouched();
       this.errorMessage.set('Completa los campos obligatorios con valores válidos.');
       return;
-    }
-
-    const { type, totalValue, downPaymentPercentage, termMonths, residualPercentage } =
-      this.form.getRawValue();
-
-    if (typeof totalValue !== 'number' || typeof downPaymentPercentage !== 'number') {
-      this.errorMessage.set('Completa los campos obligatorios con valores válidos.');
-      return;
-    }
-
-    const request: QuoteRequest = {
-      type,
-      totalValue,
-      downPaymentPercentage,
-      termMonths,
-    };
-
-    if (type === 'arrendamiento') {
-      if (typeof residualPercentage !== 'number') {
-        this.errorMessage.set('Completa los campos obligatorios con valores válidos.');
-        return;
-      }
-      request.residualPercentage = residualPercentage;
     }
 
     this.isSubmitting.set(true);
@@ -100,6 +113,113 @@ export class QuotePageComponent {
         this.isSubmitting.set(false);
       },
     });
+  }
+
+  searchProspects(): void {
+    const search = this.prospectSearchControl.value.trim();
+    this.isSearchingProspects.set(true);
+    this.prospectErrorMessage.set('');
+
+    this.http
+      .get<Prospect[]>('/customers', {
+        params: search ? { search } : {},
+      })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (prospects) => {
+          this.prospects.set(prospects);
+          this.isSearchingProspects.set(false);
+        },
+        error: (error: unknown) => {
+          this.prospects.set([]);
+          this.prospectErrorMessage.set(this.getProspectErrorMessage(error));
+          this.isSearchingProspects.set(false);
+        },
+      });
+  }
+
+  selectProspect(prospect: Prospect): void {
+    this.selectedProspect.set(prospect);
+    this.prospectSearchControl.setValue(`${prospect.fullName} (${prospect.email})`);
+    this.prospectErrorMessage.set('');
+    this.saveErrorMessage.set('');
+    this.saveSuccessMessage.set('');
+  }
+
+  createProspect(): void {
+    if (this.prospectForm.invalid) {
+      this.prospectForm.markAllAsTouched();
+      this.prospectErrorMessage.set('Completa nombre, teléfono y correo para registrar el prospecto.');
+      return;
+    }
+
+    const { fullName, phone, email } = this.prospectForm.getRawValue();
+    this.isCreatingProspect.set(true);
+    this.prospectErrorMessage.set('');
+
+    this.http
+      .post<Prospect>('/customers', { fullName, phone, email })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (prospect) => {
+          this.selectedProspect.set(prospect);
+          this.prospects.update((current: Prospect[]) => [
+            prospect,
+            ...current.filter((item: Prospect) => item.id !== prospect.id),
+          ]);
+          this.prospectSearchControl.setValue(`${prospect.fullName} (${prospect.email})`);
+          this.prospectForm.reset();
+          this.isCreatingProspect.set(false);
+        },
+        error: (error: unknown) => {
+          this.prospectErrorMessage.set(this.getProspectErrorMessage(error));
+          this.isCreatingProspect.set(false);
+        },
+      });
+  }
+
+  saveQuote(): void {
+    const quote = this.quote();
+    const prospect = this.selectedProspect();
+    if (!quote) {
+      this.saveErrorMessage.set('Primero genera la cotización antes de guardarla.');
+      return;
+    }
+
+    if (!prospect) {
+      this.saveErrorMessage.set('Selecciona un prospecto activo antes de guardar la cotización.');
+      return;
+    }
+
+    const request = this.buildQuoteRequestFromForm();
+    if (!request) {
+      this.saveErrorMessage.set('Completa los campos obligatorios con valores válidos.');
+      return;
+    }
+
+    this.isSavingQuote.set(true);
+    this.saveErrorMessage.set('');
+    this.saveSuccessMessage.set('');
+
+    const payload: SaveQuoteRequest = {
+      prospectId: prospect.id,
+      input: request,
+      result: quote,
+    };
+
+    this.http
+      .post('/quotes/saved', payload)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.saveSuccessMessage.set(`Cotización guardada correctamente para ${prospect.fullName}.`);
+          this.isSavingQuote.set(false);
+        },
+        error: (error: unknown) => {
+          this.saveErrorMessage.set(this.getSaveErrorMessage(error));
+          this.isSavingQuote.set(false);
+        },
+      });
   }
 
   downloadPdf(): void {
@@ -130,17 +250,82 @@ export class QuotePageComponent {
       });
   }
 
+  private buildQuoteRequestFromForm(): QuoteRequest | null {
+    const { type, totalValue, downPaymentPercentage, termMonths, residualPercentage } =
+      this.form.getRawValue();
+
+    if (typeof totalValue !== 'number' || typeof downPaymentPercentage !== 'number') {
+      return null;
+    }
+
+    const request: QuoteRequest = {
+      type,
+      totalValue,
+      downPaymentPercentage,
+      termMonths,
+    };
+
+    if (type === 'arrendamiento') {
+      if (typeof residualPercentage !== 'number') {
+        return null;
+      }
+      request.residualPercentage = residualPercentage;
+    }
+
+    return request;
+  }
+
   private getErrorMessage(error: unknown): string {
-    if (error instanceof Error && error.message) {
-      return error.message;
+    const message = getHttpMessage(error);
+    if (message) {
+      return message;
     }
 
     return 'No fue posible generar la cotización. Intenta de nuevo.';
   }
 
+  private getProspectErrorMessage(error: unknown): string {
+    const message = getHttpMessage(error);
+    if (message) {
+      return message;
+    }
+
+    return 'No fue posible completar la solicitud del prospecto. Intenta de nuevo.';
+  }
+
+  private getSaveErrorMessage(error: unknown): string {
+    const message = getHttpMessage(error);
+    if (message) {
+      return message;
+    }
+
+    return 'No fue posible guardar la cotización. Intenta de nuevo.';
+  }
+
   private getDownloadErrorMessage(): string {
     return 'No fue posible descargar el PDF de la cotización. Intenta de nuevo.';
   }
+}
+
+function getHttpMessage(error: unknown): string | null {
+  if (error instanceof HttpErrorResponse) {
+    const message = error.error?.message;
+    if (typeof message === 'string') {
+      return message;
+    }
+    if (Array.isArray(message) && message.every((item) => typeof item === 'string')) {
+      return message.join(' ');
+    }
+    if (typeof error.error === 'string') {
+      return error.error;
+    }
+  }
+
+  if (error instanceof Error && error.message) {
+    return error.message;
+  }
+
+  return null;
 }
 
 function startPdfDownload(pdf: Blob): void {
