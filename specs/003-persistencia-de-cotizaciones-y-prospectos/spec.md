@@ -1,5 +1,5 @@
 Name: 003 Persistencia de Cotizaciones y Prospectos
-Status: Approved
+Status: In progress
 Date: 2026-11-10 09:36
 
 ## Description
