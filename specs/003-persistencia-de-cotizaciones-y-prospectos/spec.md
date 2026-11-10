@@ -48,9 +48,9 @@ El frontend existente usa Angular y el backend de cotizaciones y el microservici
 ## Open questions
 
 
-## Proposed tasks
-- T001 - Preparar PostgreSQL y migraciones: configurar la base de datos en Docker Compose y crear migraciones para las estructuras persistentes requeridas.
-- T002 - Implementar catálogo de prospectos: completar los endpoints de `customers`, sus validaciones y la baja lógica.
-- T003 - Persistir cotizaciones: guardar desde el backend la cotización calculada asociada a un prospecto y conservar su respuesta original.
-- T004 - Integrar prospectos y guardado en la interfaz: buscar, seleccionar o registrar prospectos y ofrecer el guardado explícito con manejo de errores.
-- T005 - Validar integración de persistencia: verificar migraciones, servicios y flujo de punta a punta con Docker Compose.
+## Tasks
+- [ ] [T001 - Preparar PostgreSQL y migraciones](tasks/T001-preparar-postgresql-y-migraciones.md)
+- [ ] [T002 - Implementación del catálogo de prospectos](tasks/T002-implementacion-de-catalogo-de-prospectos.md)
+- [ ] [T003 - Persistir cotizaciones](tasks/T003-persistir-cotizaciones.md)
+- [ ] [T004 - Integrar prospectos y guardado en la interfaz](tasks/T004-integrar-prospectos-y-guardado-en-la-interfaz.md)
+- [ ] [T005 - Validar integración de persistencia](tasks/T005-validar-integracion-de-persistencia.md)
