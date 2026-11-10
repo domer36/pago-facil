@@ -1,5 +1,5 @@
 Name: 002 Descarga de Cotizaciones en PDF
-Status: Approved
+Status: In progress
 Date: 2026-11-09 18:10
 
 ## Description
