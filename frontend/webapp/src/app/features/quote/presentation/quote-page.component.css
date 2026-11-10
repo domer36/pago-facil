@@ -233,6 +233,14 @@ tbody th {
   color: #174b40;
 }
 
+.download-button {
+  margin-top: 1.25rem;
+}
+
+.download-error {
+  margin: 1rem 0 0;
+}
+
 @media (max-width: 720px) {
   .page-shell {
     width: min(100% - 1.25rem, 40rem);
