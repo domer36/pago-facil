@@ -1,7 +1,7 @@
 import { CurrencyPipe, registerLocaleData } from '@angular/common';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import localeEsMx from '@angular/common/locales/es-MX';
-import { Component, DestroyRef, inject, signal } from '@angular/core';
+import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { debounceTime } from 'rxjs';
@@ -53,6 +53,8 @@ export class QuotePageComponent {
   });
 
   readonly quote = signal<QuoteResponse | null>(null);
+  readonly isEditingQuote = signal(false);
+  readonly visibleQuote = computed(() => (this.isEditingQuote() ? null : this.quote()));
   readonly prospects = signal<Prospect[]>([]);
   readonly selectedProspect = signal<Prospect | null>(null);
   readonly errorMessage = signal('');
@@ -125,6 +127,7 @@ export class QuotePageComponent {
     this.createQuote.execute(request).subscribe({
       next: (quote) => {
         this.quote.set(quote);
+        this.isEditingQuote.set(false);
         this.isSubmitting.set(false);
       },
       error: (error: unknown) => {
@@ -132,6 +135,10 @@ export class QuotePageComponent {
         this.isSubmitting.set(false);
       },
     });
+  }
+
+  editQuote(): void {
+    this.isEditingQuote.set(true);
   }
 
   searchProspects(): void {

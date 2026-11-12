@@ -132,6 +132,12 @@ h2 {
   white-space: nowrap;
 }
 
+.result-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
 .form-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -371,6 +377,10 @@ button {
   background: #1f8a7a;
 }
 
+.edit-button {
+  background: #1f8a7a;
+}
+
 .save-button {
   margin-top: 0.5rem;
 }
@@ -381,6 +391,10 @@ button:hover:not(:disabled) {
 }
 
 .secondary-button:hover:not(:disabled) {
+  background: #12715e;
+}
+
+.edit-button:hover:not(:disabled) {
   background: #12715e;
 }
 
@@ -508,5 +522,9 @@ tbody th {
 
   .section-heading {
     flex-direction: column;
+  }
+
+  .result-actions {
+    flex-wrap: wrap;
   }
 }

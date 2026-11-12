@@ -9,129 +9,134 @@
 </header>
 
 <main class="page-shell">
-  <header class="page-header">
-    <p class="eyebrow">PAGO FÁCIL · FINANCIAMIENTO</p>
-    <h1>Cotizador financiero</h1>
-    <p class="intro">Compara tu plan de pagos con una cotización calculada de forma segura.</p>
-  </header>
+  @if (!visibleQuote()) {
+    <header class="page-header">
+      <p class="eyebrow">PAGO FÁCIL · FINANCIAMIENTO</p>
+      <h1>Cotizador financiero</h1>
+      <p class="intro">Compara tu plan de pagos con una cotización calculada de forma segura.</p>
+    </header>
 
-  <section class="calculator-card" aria-labelledby="form-title">
-    <div class="section-heading">
-      <div>
-        <p class="eyebrow">DATOS DE COTIZACIÓN</p>
-        <h2 id="form-title">Configura tu financiamiento</h2>
+    <section class="calculator-card" aria-labelledby="form-title">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">DATOS DE COTIZACIÓN</p>
+          <h2 id="form-title">Configura tu financiamiento</h2>
+        </div>
+        <span class="currency-note">Importes en MXN</span>
       </div>
-      <span class="currency-note">Importes en MXN</span>
-    </div>
 
-    <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
-      <div class="form-grid">
-        <label class="field">
-          <span>Tipo de financiamiento</span>
-          <select formControlName="type">
-            <option value="credito-simple">Crédito simple</option>
-            <option value="arrendamiento">Arrendamiento</option>
-            <option value="msi">Meses sin intereses (MSI)</option>
-          </select>
-        </label>
-
-        <label class="field">
-          <span>Valor total (MXN)</span>
-          <input
-            type="number"
-            formControlName="totalValue"
-            min="0.01"
-            step="0.01"
-            placeholder="Ej. 150000"
-            inputmode="decimal"
-          />
-          @if (form.controls.totalValue.touched && form.controls.totalValue.invalid) {
-            <small class="field-error">Ingresa un valor mayor que cero.</small>
-          }
-        </label>
-
-        <label class="field">
-          <span>Enganche (%)</span>
-          <input
-            type="number"
-            formControlName="downPaymentPercentage"
-            min="0"
-            max="80"
-            step="0.01"
-            inputmode="decimal"
-          />
-          @if (
-            form.controls.downPaymentPercentage.touched &&
-            form.controls.downPaymentPercentage.invalid
-          ) {
-            <small class="field-error">El enganche debe estar entre 0% y 80%.</small>
-          }
-        </label>
-
-        <label class="field">
-          <span>Plazo</span>
-          <select formControlName="termMonths">
-            @for (term of terms; track term) {
-              <option [ngValue]="term">{{ term }} meses</option>
-            }
-          </select>
-        </label>
-
-        @if (form.controls.type.value === 'arrendamiento') {
+      <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+        <div class="form-grid">
           <label class="field">
-            <span>Residual (%)</span>
+            <span>Tipo de financiamiento</span>
+            <select formControlName="type">
+              <option value="credito-simple">Crédito simple</option>
+              <option value="arrendamiento">Arrendamiento</option>
+              <option value="msi">Meses sin intereses (MSI)</option>
+            </select>
+          </label>
+
+          <label class="field">
+            <span>Valor total (MXN)</span>
             <input
               type="number"
-              formControlName="residualPercentage"
+              formControlName="totalValue"
+              min="0.01"
+              step="0.01"
+              placeholder="Ej. 150000"
+              inputmode="decimal"
+            />
+            @if (form.controls.totalValue.touched && form.controls.totalValue.invalid) {
+              <small class="field-error">Ingresa un valor mayor que cero.</small>
+            }
+          </label>
+
+          <label class="field">
+            <span>Enganche (%)</span>
+            <input
+              type="number"
+              formControlName="downPaymentPercentage"
               min="0"
               max="80"
               step="0.01"
               inputmode="decimal"
             />
             @if (
-              form.controls.residualPercentage.touched && form.controls.residualPercentage.invalid
+              form.controls.downPaymentPercentage.touched &&
+              form.controls.downPaymentPercentage.invalid
             ) {
-              <small class="field-error">El residual debe estar entre 0% y 80%.</small>
+              <small class="field-error">El enganche debe estar entre 0% y 80%.</small>
             }
           </label>
+
+          <label class="field">
+            <span>Plazo</span>
+            <select formControlName="termMonths">
+              @for (term of terms; track term) {
+                <option [ngValue]="term">{{ term }} meses</option>
+              }
+            </select>
+          </label>
+
+          @if (form.controls.type.value === 'arrendamiento') {
+            <label class="field">
+              <span>Residual (%)</span>
+              <input
+                type="number"
+                formControlName="residualPercentage"
+                min="0"
+                max="80"
+                step="0.01"
+                inputmode="decimal"
+              />
+              @if (
+                form.controls.residualPercentage.touched && form.controls.residualPercentage.invalid
+              ) {
+                <small class="field-error">El residual debe estar entre 0% y 80%.</small>
+              }
+            </label>
+          }
+        </div>
+
+        <p class="form-hint">
+          El monto financiado debe ser de al menos MXN 50,000. La suma del enganche y el residual no
+          puede superar 100%.
+        </p>
+
+        @if (errorMessage()) {
+          <div class="error-message" role="alert">{{ errorMessage() }}</div>
         }
-      </div>
 
-      <p class="form-hint">
-        El monto financiado debe ser de al menos MXN 50,000. La suma del enganche y el residual no
-        puede superar 100%.
-      </p>
+        <button type="submit" [disabled]="isSubmitting()">
+          {{ isSubmitting() ? 'Calculando…' : 'Generar cotización' }}
+        </button>
+      </form>
+    </section>
+  }
 
-      @if (errorMessage()) {
-        <div class="error-message" role="alert">{{ errorMessage() }}</div>
-      }
-
-      <button type="submit" [disabled]="isSubmitting()">
-        {{ isSubmitting() ? 'Calculando…' : 'Generar cotización' }}
-      </button>
-    </form>
-  </section>
-
-  @if (quote(); as result) {
+  @if (visibleQuote(); as result) {
     <section class="results-card" aria-labelledby="results-title" aria-live="polite">
       <div class="section-heading">
         <div>
           <p class="eyebrow">RESULTADO</p>
           <h2 id="results-title">Plan de pagos</h2>
         </div>
-        <span class="result-type">
-          @switch (result.type) {
-            @case ('credito-simple') {
-              Crédito simple
+        <div class="result-actions">
+          <span class="result-type">
+            @switch (result.type) {
+              @case ('credito-simple') {
+                Crédito simple
+              }
+              @case ('arrendamiento') {
+                Arrendamiento
+              }
+              @case ('msi') {
+                Meses sin intereses
+              }
             }
-            @case ('arrendamiento') {
-              Arrendamiento
-            }
-            @case ('msi') {
-              Meses sin intereses
-            }
-          }
-        </span>
+          </span>
+          <button class="edit-button" type="button" (click)="editQuote()">Editar cotización</button>
+        </div>
       </div>
 
       <dl class="summary-grid">
@@ -212,7 +217,12 @@
               placeholder="Nombre o correo"
               aria-label="Buscar prospecto"
             />
-            <button class="secondary-button" type="button" [disabled]="isSearchingProspects()" (click)="searchProspects()">
+            <button
+              class="secondary-button"
+              type="button"
+              [disabled]="isSearchingProspects()"
+              (click)="searchProspects()"
+            >
               {{ isSearchingProspects() ? 'Buscando…' : 'Buscar' }}
             </button>
           </div>
@@ -255,20 +265,39 @@
 
         @if (isProspectModalOpen()) {
           <div class="prospect-modal-backdrop" (click)="closeProspectModal()">
-            <div class="prospect-modal" role="dialog" aria-modal="true" aria-labelledby="new-prospect-title" (click)="$event.stopPropagation()">
+            <div
+              class="prospect-modal"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="new-prospect-title"
+              (click)="$event.stopPropagation()"
+            >
               <div class="modal-header">
                 <h3 id="new-prospect-title">Registrar nuevo prospecto</h3>
-                <button class="close-button" type="button" aria-label="Cerrar modal" (click)="closeProspectModal()">
+                <button
+                  class="close-button"
+                  type="button"
+                  aria-label="Cerrar modal"
+                  (click)="closeProspectModal()"
+                >
                   ×
                 </button>
               </div>
 
-              <form class="prospect-form" [formGroup]="prospectForm" (ngSubmit)="createProspect()" novalidate>
+              <form
+                class="prospect-form"
+                [formGroup]="prospectForm"
+                (ngSubmit)="createProspect()"
+                novalidate
+              >
                 <div class="form-grid inline-grid">
                   <label class="field">
                     <span>Nombre</span>
                     <input type="text" formControlName="fullName" placeholder="Nombre completo" />
-                    @if (prospectForm.controls.fullName.touched && prospectForm.controls.fullName.invalid) {
+                    @if (
+                      prospectForm.controls.fullName.touched &&
+                      prospectForm.controls.fullName.invalid
+                    ) {
                       <small class="field-error">El nombre es obligatorio.</small>
                     }
                   </label>
@@ -276,7 +305,9 @@
                   <label class="field">
                     <span>Teléfono</span>
                     <input type="tel" formControlName="phone" placeholder="Ej. 5512345678" />
-                    @if (prospectForm.controls.phone.touched && prospectForm.controls.phone.invalid) {
+                    @if (
+                      prospectForm.controls.phone.touched && prospectForm.controls.phone.invalid
+                    ) {
                       <small class="field-error">El teléfono es obligatorio.</small>
                     }
                   </label>
@@ -284,7 +315,9 @@
                   <label class="field">
                     <span>Correo electrónico</span>
                     <input type="email" formControlName="email" placeholder="correo@ejemplo.com" />
-                    @if (prospectForm.controls.email.touched && prospectForm.controls.email.invalid) {
+                    @if (
+                      prospectForm.controls.email.touched && prospectForm.controls.email.invalid
+                    ) {
                       <small class="field-error">Ingresa un correo válido.</small>
                     }
                   </label>
@@ -311,7 +344,12 @@
           <div class="success-message" role="status">{{ saveSuccessMessage() }}</div>
         }
 
-        <button class="save-button" type="button" [disabled]="isSavingQuote() || !selectedProspect()" (click)="saveQuote()">
+        <button
+          class="save-button"
+          type="button"
+          [disabled]="isSavingQuote() || !selectedProspect()"
+          (click)="saveQuote()"
+        >
           {{ isSavingQuote() ? 'Guardando cotización…' : 'Guardar cotización' }}
         </button>
       </div>

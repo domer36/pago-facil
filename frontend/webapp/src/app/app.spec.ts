@@ -56,6 +56,26 @@ describe('QuotePageComponent', () => {
     expect(host.querySelector('input[formControlName="residualPercentage"]')).toBeNull();
   });
 
+  it('shows only the result after quoting and returns to the form without losing inputs', () => {
+    const fixture = TestBed.createComponent(QuotePageComponent);
+    const component = fixture.componentInstance;
+    const host = fixture.nativeElement as HTMLElement;
+    component.form.patchValue({ totalValue: 150_000, downPaymentPercentage: 10 });
+    component.quote.set(createQuote('credito-simple', null));
+    fixture.detectChanges();
+
+    expect(host.querySelector('.calculator-card')).toBeNull();
+    expect(host.querySelector('.results-card')).not.toBeNull();
+
+    (host.querySelector('.edit-button') as HTMLButtonElement).click();
+    fixture.detectChanges();
+
+    expect(host.querySelector('.calculator-card')).not.toBeNull();
+    expect(host.querySelector('.results-card')).toBeNull();
+    expect(component.form.controls.totalValue.value).toBe(150_000);
+    expect(component.form.controls.downPaymentPercentage.value).toBe(10);
+  });
+
   it('limits prospect search results to ten and allows selecting one', async () => {
     const fixture = TestBed.createComponent(QuotePageComponent);
     const component = fixture.componentInstance;
@@ -252,6 +272,7 @@ describe('QuotePageComponent', () => {
   it('shows backend validation errors and removes any previous quote', () => {
     const fixture = TestBed.createComponent(QuotePageComponent);
     const component = fixture.componentInstance;
+    fixture.detectChanges();
     const form = fixture.nativeElement.querySelector('form') as HTMLFormElement;
     component.form.patchValue({ totalValue: 150_000 });
     fixture.detectChanges();
