@@ -56,6 +56,85 @@ describe('QuotePageComponent', () => {
     expect(host.querySelector('input[formControlName="residualPercentage"]')).toBeNull();
   });
 
+  it('limits prospect search results to ten and allows selecting one', async () => {
+    const fixture = TestBed.createComponent(QuotePageComponent);
+    const component = fixture.componentInstance;
+
+    component.quote.set(createQuote('credito-simple', null));
+    fixture.detectChanges();
+
+    component.prospectSearchControl.setValue('ana');
+    fixture.detectChanges();
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    fixture.detectChanges();
+
+    const request = httpTesting.expectOne((req) => req.url === '/customers' && req.params.get('search') === 'ana');
+    const prospects = Array.from({ length: 12 }, (_, index) => ({
+      id: `pro-${index + 1}`,
+      fullName: `Ana ${index + 1}`,
+      phone: `551000${index + 1}`,
+      email: `ana${index + 1}@mail.com`,
+      active: true,
+      createdAt: '2024-01-01T00:00:00.000Z',
+      updatedAt: '2024-01-01T00:00:00.000Z',
+    }));
+    request.flush(prospects);
+    fixture.detectChanges();
+
+    const host = fixture.nativeElement as HTMLElement;
+    expect(host.querySelectorAll('.prospect-option')).toHaveLength(10);
+
+    (host.querySelectorAll('.prospect-option')[3] as HTMLButtonElement).click();
+    fixture.detectChanges();
+
+    expect(component.selectedProspect()?.id).toBe('pro-4');
+    expect(component.prospectSearchControl.value).toBe('Ana 4 (ana4@mail.com)');
+  });
+
+  it('opens a modal to register a new prospect and shows Spanish validation errors', () => {
+    const fixture = TestBed.createComponent(QuotePageComponent);
+    const component = fixture.componentInstance;
+    component.quote.set(createQuote('credito-simple', null));
+
+    component.openProspectModal();
+    fixture.detectChanges();
+
+    expect((fixture.nativeElement as HTMLElement).querySelector('.prospect-modal')).not.toBeNull();
+
+    component.prospectForm.setValue({
+      fullName: '',
+      phone: '',
+      email: '',
+    });
+    component.createProspect();
+    fixture.detectChanges();
+
+    expect((fixture.nativeElement as HTMLElement).querySelector('[role="alert"]')?.textContent).toContain(
+      'Completa nombre, teléfono y correo para registrar el prospecto.',
+    );
+
+    component.prospectForm.setValue({
+      fullName: 'Luis Pérez',
+      phone: '5512345678',
+      email: 'luis@mail.com',
+    });
+    component.createProspect();
+    httpTesting.expectOne('/customers').flush(
+      {
+        statusCode: 409,
+        message: 'Ya existe un prospecto registrado con ese correo electrónico.',
+        error: 'Conflict',
+      },
+      { status: 409, statusText: 'Conflict' },
+    );
+    fixture.detectChanges();
+
+    expect((fixture.nativeElement as HTMLElement).querySelector('[role="alert"]')?.textContent).toContain(
+      'Ya existe un prospecto registrado con ese correo electrónico.',
+    );
+    expect(component.isProspectModalOpen()).toBe(true);
+  });
+
   it('posts the quote to the PDF service and starts a direct browser download', () => {
     const fixture = TestBed.createComponent(QuotePageComponent);
     const quote = createQuote('credito-simple', null);

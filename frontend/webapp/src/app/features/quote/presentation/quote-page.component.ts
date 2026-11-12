@@ -4,6 +4,7 @@ import localeEsMx from '@angular/common/locales/es-MX';
 import { Component, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { debounceTime } from 'rxjs';
 import type {
   Prospect,
   QuoteRequest,
@@ -64,6 +65,7 @@ export class QuotePageComponent {
   readonly isCreatingProspect = signal(false);
   readonly isSavingQuote = signal(false);
   readonly isDownloadingPdf = signal(false);
+  readonly isProspectModalOpen = signal(false);
   private readonly destroyRef = inject(DestroyRef);
   private readonly http = inject(HttpClient);
 
@@ -86,6 +88,23 @@ export class QuotePageComponent {
       this.saveSuccessMessage.set('');
       this.downloadErrorMessage.set('');
     });
+
+    this.prospectSearchControl.valueChanges
+      .pipe(debounceTime(250), takeUntilDestroyed())
+      .subscribe((value) => {
+        const search = value.trim();
+        const selected = this.selectedProspect();
+        const selectionText = selected ? `${selected.fullName} (${selected.email})` : '';
+
+        if (!search || search === selectionText) {
+          if (!search) {
+            this.prospects.set([]);
+          }
+          return;
+        }
+
+        this.searchProspects();
+      });
   }
 
   submit(): void {
@@ -120,14 +139,20 @@ export class QuotePageComponent {
     this.isSearchingProspects.set(true);
     this.prospectErrorMessage.set('');
 
+    if (!search) {
+      this.prospects.set([]);
+      this.isSearchingProspects.set(false);
+      return;
+    }
+
     this.http
       .get<Prospect[]>('/customers', {
-        params: search ? { search } : {},
+        params: { search },
       })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (prospects) => {
-          this.prospects.set(prospects);
+          this.prospects.set(prospects.slice(0, 10));
           this.isSearchingProspects.set(false);
         },
         error: (error: unknown) => {
@@ -138,9 +163,22 @@ export class QuotePageComponent {
       });
   }
 
+  openProspectModal(): void {
+    this.prospectForm.reset();
+    this.prospectErrorMessage.set('');
+    this.isProspectModalOpen.set(true);
+  }
+
+  closeProspectModal(): void {
+    this.isProspectModalOpen.set(false);
+    this.prospectForm.reset();
+    this.prospectErrorMessage.set('');
+  }
+
   selectProspect(prospect: Prospect): void {
     this.selectedProspect.set(prospect);
     this.prospectSearchControl.setValue(`${prospect.fullName} (${prospect.email})`);
+    this.prospects.set([]);
     this.prospectErrorMessage.set('');
     this.saveErrorMessage.set('');
     this.saveSuccessMessage.set('');
@@ -163,13 +201,11 @@ export class QuotePageComponent {
       .subscribe({
         next: (prospect) => {
           this.selectedProspect.set(prospect);
-          this.prospects.update((current: Prospect[]) => [
-            prospect,
-            ...current.filter((item: Prospect) => item.id !== prospect.id),
-          ]);
+          this.prospects.set([prospect]);
           this.prospectSearchControl.setValue(`${prospect.fullName} (${prospect.email})`);
           this.prospectForm.reset();
           this.isCreatingProspect.set(false);
+          this.isProspectModalOpen.set(false);
         },
         error: (error: unknown) => {
           this.prospectErrorMessage.set(this.getProspectErrorMessage(error));

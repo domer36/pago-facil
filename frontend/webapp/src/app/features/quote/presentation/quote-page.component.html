@@ -209,7 +209,7 @@
             <input
               type="search"
               [formControl]="prospectSearchControl"
-              placeholder="Nombre, teléfono o correo"
+              placeholder="Nombre o correo"
               aria-label="Buscar prospecto"
             />
             <button class="secondary-button" type="button" [disabled]="isSearchingProspects()" (click)="searchProspects()">
@@ -247,38 +247,61 @@
           <div class="error-message" role="alert">{{ prospectErrorMessage() }}</div>
         }
 
-        <form class="prospect-form" [formGroup]="prospectForm" (ngSubmit)="createProspect()" novalidate>
-          <h3>Registrar nuevo prospecto</h3>
-          <div class="form-grid inline-grid">
-            <label class="field">
-              <span>Nombre</span>
-              <input type="text" formControlName="fullName" placeholder="Nombre completo" />
-              @if (prospectForm.controls.fullName.touched && prospectForm.controls.fullName.invalid) {
-                <small class="field-error">El nombre es obligatorio.</small>
-              }
-            </label>
-
-            <label class="field">
-              <span>Teléfono</span>
-              <input type="tel" formControlName="phone" placeholder="Ej. 5512345678" />
-              @if (prospectForm.controls.phone.touched && prospectForm.controls.phone.invalid) {
-                <small class="field-error">El teléfono es obligatorio.</small>
-              }
-            </label>
-
-            <label class="field">
-              <span>Correo electrónico</span>
-              <input type="email" formControlName="email" placeholder="correo@ejemplo.com" />
-              @if (prospectForm.controls.email.touched && prospectForm.controls.email.invalid) {
-                <small class="field-error">Ingresa un correo válido.</small>
-              }
-            </label>
-          </div>
-
-          <button class="secondary-button" type="submit" [disabled]="isCreatingProspect()">
-            {{ isCreatingProspect() ? 'Registrando…' : 'Registrar prospecto' }}
+        <div class="prospect-action-row">
+          <button class="secondary-button" type="button" (click)="openProspectModal()">
+            Registrar nuevo prospecto
           </button>
-        </form>
+        </div>
+
+        @if (isProspectModalOpen()) {
+          <div class="prospect-modal-backdrop" (click)="closeProspectModal()">
+            <div class="prospect-modal" role="dialog" aria-modal="true" aria-labelledby="new-prospect-title" (click)="$event.stopPropagation()">
+              <div class="modal-header">
+                <h3 id="new-prospect-title">Registrar nuevo prospecto</h3>
+                <button class="close-button" type="button" aria-label="Cerrar modal" (click)="closeProspectModal()">
+                  ×
+                </button>
+              </div>
+
+              <form class="prospect-form" [formGroup]="prospectForm" (ngSubmit)="createProspect()" novalidate>
+                <div class="form-grid inline-grid">
+                  <label class="field">
+                    <span>Nombre</span>
+                    <input type="text" formControlName="fullName" placeholder="Nombre completo" />
+                    @if (prospectForm.controls.fullName.touched && prospectForm.controls.fullName.invalid) {
+                      <small class="field-error">El nombre es obligatorio.</small>
+                    }
+                  </label>
+
+                  <label class="field">
+                    <span>Teléfono</span>
+                    <input type="tel" formControlName="phone" placeholder="Ej. 5512345678" />
+                    @if (prospectForm.controls.phone.touched && prospectForm.controls.phone.invalid) {
+                      <small class="field-error">El teléfono es obligatorio.</small>
+                    }
+                  </label>
+
+                  <label class="field">
+                    <span>Correo electrónico</span>
+                    <input type="email" formControlName="email" placeholder="correo@ejemplo.com" />
+                    @if (prospectForm.controls.email.touched && prospectForm.controls.email.invalid) {
+                      <small class="field-error">Ingresa un correo válido.</small>
+                    }
+                  </label>
+                </div>
+
+                <div class="modal-actions">
+                  <button class="secondary-button" type="button" (click)="closeProspectModal()">
+                    Cancelar
+                  </button>
+                  <button class="secondary-button" type="submit" [disabled]="isCreatingProspect()">
+                    {{ isCreatingProspect() ? 'Registrando…' : 'Registrar prospecto' }}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        }
 
         @if (saveErrorMessage()) {
           <div class="error-message" role="alert">{{ saveErrorMessage() }}</div>
