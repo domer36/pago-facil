@@ -1,5 +1,5 @@
 Name: 004 Rediseño de Experiencia del Cotizador
-Status: Approved
+Status: In progress
 Date: 2026-11-10 16:36
 
 ## Description
