@@ -42,9 +42,7 @@ El frontend existente usa Angular. Se deben reutilizar los servicios y contratos
 ## Open questions
 - Ninguna.
 
-## Proposed tasks
-Outline only; the task files are created later by create-tasks.
-- T001 - Rediseñar la pantalla de cotización: Aplicar el sistema visual fintech, cabecera y diseño adaptable al flujo de captura.
-- T002 - Rediseñar la pantalla de resultado: Presentar resumen, tabla de amortización y acciones existentes con diseño adaptable.
-- T003 - Integrar selector y alta de prospectos: Añadir el desplegable con autocompletado limitado y conservar el modal y sus validaciones existentes.
-- T004 - Validar experiencia y regresiones: Comprobar el flujo en escritorio, tableta y móvil y verificar que se conserven cálculo, guardado, errores y descarga PDF.
+## Tasks
+- [ ] [T001 - Rediseñar pantalla de cotización](tasks/T001-rediseno-pantalla-cotizacion.md)
+- [ ] [T002 - Rediseñar resultado y amortización](tasks/T002-rediseno-resultado-amortizacion.md)
+- [ ] [T003 - Integrar selector y alta de prospectos](tasks/T003-selector-alta-prospectos.md)
