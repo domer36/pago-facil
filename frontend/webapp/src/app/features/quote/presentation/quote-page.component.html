@@ -1,49 +1,96 @@
 <header class="topbar" aria-label="Cabecera del cotizador">
   <div class="topbar-inner">
     <div class="brand-block">
-      <span class="brand-mark">Pago Facil</span>
+      <span class="brand-symbol" aria-hidden="true">P</span>
+      <span class="brand-mark">Pago Fácil</span>
     </div>
     <div class="product-block">Cotizador financiero</div>
-    <div class="user-block">Usuario</div>
   </div>
 </header>
 
 <main class="page-shell">
   @if (!visibleQuote()) {
     <header class="page-header">
-      <p class="eyebrow">PAGO FÁCIL · FINANCIAMIENTO</p>
-      <h1>Cotizador financiero</h1>
-      <p class="intro">Compara tu plan de pagos con una cotización calculada de forma segura.</p>
+      <div>
+        <p class="eyebrow">NUEVA COTIZACIÓN</p>
+        <h1>Construye una opción a tu medida</h1>
+        <p class="intro">
+          Selecciona el producto e ingresa los datos para proyectar el plan de pagos.
+        </p>
+      </div>
+      <span class="instant-badge"><span aria-hidden="true">✓</span> Cálculo instantáneo</span>
     </header>
 
-    <section class="calculator-card" aria-labelledby="form-title">
-      <div class="section-heading">
-        <div>
-          <p class="eyebrow">DATOS DE COTIZACIÓN</p>
-          <h2 id="form-title">Configura tu financiamiento</h2>
+    <form id="quote-form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <section class="product-selection" aria-labelledby="product-title">
+        <h2 id="product-title" class="step-label">1. Elige el producto</h2>
+        <div class="product-options" role="radiogroup" aria-labelledby="product-title">
+          <label class="product-option">
+            <input type="radio" formControlName="type" value="arrendamiento" />
+            <span class="product-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M5 20V5.5a1 1 0 0 1 1-1h9l4 4V20M8 9h2m-2 4h2m-2 4h2m3-8h3m-3 4h3m-3 4h3M3 20h18"
+                />
+              </svg>
+            </span>
+            <span class="product-copy">
+              <strong>Arrendamiento</strong>
+              <small>Para activos productivos</small>
+            </span>
+            <span class="product-radio" aria-hidden="true"></span>
+          </label>
+          <label class="product-option">
+            <input type="radio" formControlName="type" value="msi" />
+            <span class="product-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none">
+                <rect x="3" y="5" width="18" height="14" rx="2" />
+                <path d="M3 9h18m-14 6h4" />
+              </svg>
+            </span>
+            <span class="product-copy">
+              <strong>Meses sin intereses</strong>
+              <small>Pagos fijos, tasa 0%</small>
+            </span>
+            <span class="product-radio" aria-hidden="true"></span>
+          </label>
+          <label class="product-option">
+            <input type="radio" formControlName="type" value="credito-simple" />
+            <span class="product-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none">
+                <rect x="3" y="4" width="18" height="16" rx="2" />
+                <path d="M3 9h18m-14 5h4" />
+              </svg>
+            </span>
+            <span class="product-copy">
+              <strong>Crédito simple</strong>
+              <small>Capital para tu negocio</small>
+            </span>
+            <span class="product-radio" aria-hidden="true"></span>
+          </label>
         </div>
-        <span class="currency-note">Importes en MXN</span>
-      </div>
+      </section>
 
-      <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <section class="calculator-card" aria-labelledby="form-title">
+        <div class="section-heading">
+          <div class="form-title-group">
+            <span class="step-number">2</span>
+            <div>
+              <h2 id="form-title">Datos de la cotización</h2>
+              <p>Completa los datos para calcular tu plan.</p>
+            </div>
+          </div>
+        </div>
+
         <div class="form-grid">
           <label class="field">
-            <span>Tipo de financiamiento</span>
-            <select formControlName="type">
-              <option value="credito-simple">Crédito simple</option>
-              <option value="arrendamiento">Arrendamiento</option>
-              <option value="msi">Meses sin intereses (MSI)</option>
-            </select>
-          </label>
-
-          <label class="field">
-            <span>Valor total (MXN)</span>
+            <span>Valor del activo</span>
             <input
               type="number"
               formControlName="totalValue"
               min="0.01"
               step="0.01"
-              placeholder="Ej. 150000"
+              placeholder="Ej. 850000"
               inputmode="decimal"
             />
             @if (form.controls.totalValue.touched && form.controls.totalValue.invalid) {
@@ -52,7 +99,7 @@
           </label>
 
           <label class="field">
-            <span>Enganche (%)</span>
+            <span>Pago inicial (%)</span>
             <input
               type="number"
               formControlName="downPaymentPercentage"
@@ -61,11 +108,12 @@
               step="0.01"
               inputmode="decimal"
             />
+            <small class="field-help">Porcentaje del valor del activo</small>
             @if (
               form.controls.downPaymentPercentage.touched &&
               form.controls.downPaymentPercentage.invalid
             ) {
-              <small class="field-error">El enganche debe estar entre 0% y 80%.</small>
+              <small class="field-error">El pago inicial debe estar entre 0% y 80%.</small>
             }
           </label>
 
@@ -76,6 +124,14 @@
                 <option [ngValue]="term">{{ term }} meses</option>
               }
             </select>
+          </label>
+
+          <label class="field">
+            <span>Tasa anual</span>
+            <div class="rate-input" aria-live="polite">
+              <span>{{ annualRate }}%</span>
+              <small>anual</small>
+            </div>
           </label>
 
           @if (form.controls.type.value === 'arrendamiento') {
@@ -98,20 +154,23 @@
           }
         </div>
 
-        <p class="form-hint">
-          El monto financiado debe ser de al menos MXN 50,000. La suma del enganche y el residual no
-          puede superar 100%.
-        </p>
-
         @if (errorMessage()) {
           <div class="error-message" role="alert">{{ errorMessage() }}</div>
         }
 
-        <button type="submit" [disabled]="isSubmitting()">
-          {{ isSubmitting() ? 'Calculando…' : 'Generar cotización' }}
-        </button>
-      </form>
-    </section>
+        <div class="form-footer">
+          <p class="form-hint">
+            <span aria-hidden="true">ⓘ</span>
+            Los montos mostrados incluyen IVA cuando aplica. El monto financiado mínimo es $50,000
+            MXN.
+          </p>
+          <button type="submit" [disabled]="isSubmitting()">
+            {{ isSubmitting() ? 'Calculando…' : 'Cotizar ahora' }}
+            <span aria-hidden="true">→</span>
+          </button>
+        </div>
+      </section>
+    </form>
   }
 
   @if (visibleQuote(); as result) {

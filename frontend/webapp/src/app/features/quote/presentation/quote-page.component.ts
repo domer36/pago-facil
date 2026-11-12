@@ -71,6 +71,17 @@ export class QuotePageComponent {
   private readonly destroyRef = inject(DestroyRef);
   private readonly http = inject(HttpClient);
 
+  get annualRate(): number {
+    switch (this.form.controls.type.value) {
+      case 'credito-simple':
+        return 35;
+      case 'arrendamiento':
+        return 27;
+      case 'msi':
+        return 0;
+    }
+  }
+
   constructor(
     private readonly createQuote: CreateQuote,
     private readonly downloadQuotePdf: DownloadQuotePdf,
@@ -194,7 +205,9 @@ export class QuotePageComponent {
   createProspect(): void {
     if (this.prospectForm.invalid) {
       this.prospectForm.markAllAsTouched();
-      this.prospectErrorMessage.set('Completa nombre, teléfono y correo para registrar el prospecto.');
+      this.prospectErrorMessage.set(
+        'Completa nombre, teléfono y correo para registrar el prospecto.',
+      );
       return;
     }
 
@@ -255,7 +268,9 @@ export class QuotePageComponent {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
-          this.saveSuccessMessage.set(`Cotización guardada correctamente para ${prospect.fullName}.`);
+          this.saveSuccessMessage.set(
+            `Cotización guardada correctamente para ${prospect.fullName}.`,
+          );
           this.isSavingQuote.set(false);
         },
         error: (error: unknown) => {
