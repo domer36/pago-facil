@@ -2,7 +2,7 @@ Type: task
 ID: T002
 Name: Rediseñar resultado y amortización
 Spec: 004-rediseno-de-experiencia-del-cotizador
-Status: pending
+Status: Completed
 Date: 2026-11-12 12:16
 Branch: task/004-t002-rediseno-resultado-amortizacion
 Depends on: T001
