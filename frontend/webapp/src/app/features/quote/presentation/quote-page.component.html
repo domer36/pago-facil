@@ -8,7 +8,7 @@
   </div>
 </header>
 
-<main class="page-shell">
+<main class="page-shell" [class.has-quote]="visibleQuote()">
   @if (!visibleQuote()) {
     <header class="page-header">
       <div>
@@ -174,13 +174,50 @@
   }
 
   @if (visibleQuote(); as result) {
+    <div class="quote-toolbar" aria-label="Acciones de cotización">
+      <button class="edit-button" type="button" (click)="editQuote()">Editar cotización</button>
+      <div class="quote-toolbar-actions">
+        <button
+          class="download-button"
+          type="button"
+          [disabled]="isDownloadingPdf()"
+          (click)="downloadPdf()"
+        >
+          {{ isDownloadingPdf() ? 'Preparando PDF…' : 'Descargar cotización' }}
+        </button>
+        <button
+          class="save-button"
+          type="button"
+          [disabled]="isSavingQuote() || !selectedProspect()"
+          (click)="saveQuote()"
+        >
+          {{ isSavingQuote() ? 'Guardando cotización…' : 'Guardar cotización' }}
+        </button>
+      </div>
+    </div>
+
+    @if (saveErrorMessage()) {
+      <div class="error-message quote-feedback" role="alert">{{ saveErrorMessage() }}</div>
+    }
+
+    @if (saveSuccessMessage()) {
+      <div class="success-message quote-feedback" role="status">{{ saveSuccessMessage() }}</div>
+    }
+
+    @if (downloadErrorMessage()) {
+      <div class="error-message quote-feedback" role="alert">{{ downloadErrorMessage() }}</div>
+    }
+
     <section class="results-card" aria-labelledby="results-title" aria-live="polite">
-      <div class="section-heading">
-        <div>
+      <div class="section-heading amortization-heading">
+        <div class="amortization-title">
           <p class="eyebrow">RESULTADO</p>
-          <h2 id="results-title">Plan de pagos</h2>
-        </div>
-        <div class="result-actions">
+          <h2 id="results-title">Tabla de amortización</h2>
+          <p class="intro">
+            Detalle de pagos para
+            {{ result.termMonths }}
+            meses.
+          </p>
           <span class="result-type">
             @switch (result.type) {
               @case ('credito-simple') {
@@ -194,9 +231,132 @@
               }
             }
           </span>
-          <button class="edit-button" type="button" (click)="editQuote()">Editar cotización</button>
+        </div>
+
+        <div class="prospect-controls">
+          <div class="search-row">
+            <input
+              type="search"
+              [formControl]="prospectSearchControl"
+              placeholder="Buscar prospecto"
+              aria-label="Buscar prospecto activo"
+            />
+            <button
+              class="secondary-button"
+              type="button"
+              [disabled]="isSearchingProspects()"
+              (click)="searchProspects()"
+            >
+              {{ isSearchingProspects() ? 'Buscando…' : 'Buscar' }}
+            </button>
+          </div>
+          <button class="secondary-button add-prospect-button" type="button" (click)="openProspectModal()">
+            <span aria-hidden="true">+</span>
+            Agregar prospecto
+          </button>
         </div>
       </div>
+
+      @if (prospects().length > 0) {
+        <div class="prospect-list" role="listbox" aria-label="Prospectos activos">
+          @for (prospect of prospects(); track prospect.id) {
+            <button
+              class="prospect-option"
+              type="button"
+              [class.selected]="selectedProspect()?.id === prospect.id"
+              (click)="selectProspect(prospect)"
+            >
+              <strong>{{ prospect.fullName }}</strong>
+              <span>{{ prospect.phone }}</span>
+              <small>{{ prospect.email }}</small>
+            </button>
+          }
+        </div>
+      } @else if (!isSearchingProspects() && prospectSearchControl.value.trim()) {
+        <p class="empty-state">No se encontraron prospectos activos para esa búsqueda.</p>
+      }
+
+      @if (selectedProspect(); as selected) {
+        <p class="selected-prospect">
+          Prospecto seleccionado: <strong>{{ selected.fullName }}</strong> · {{ selected.email }}
+        </p>
+      }
+
+      @if (prospectErrorMessage()) {
+        <div class="error-message" role="alert">{{ prospectErrorMessage() }}</div>
+      }
+
+      @if (isProspectModalOpen()) {
+        <div class="prospect-modal-backdrop" (click)="closeProspectModal()">
+          <div
+            class="prospect-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="new-prospect-title"
+            (click)="$event.stopPropagation()"
+          >
+            <div class="modal-header">
+              <h3 id="new-prospect-title">Registrar nuevo prospecto</h3>
+              <button
+                class="close-button"
+                type="button"
+                aria-label="Cerrar modal"
+                (click)="closeProspectModal()"
+              >
+                ×
+              </button>
+            </div>
+
+            <form
+              class="prospect-form"
+              [formGroup]="prospectForm"
+              (ngSubmit)="createProspect()"
+              novalidate
+            >
+              <div class="form-grid inline-grid">
+                <label class="field">
+                  <span>Nombre</span>
+                  <input type="text" formControlName="fullName" placeholder="Nombre completo" />
+                  @if (
+                    prospectForm.controls.fullName.touched && prospectForm.controls.fullName.invalid
+                  ) {
+                    <small class="field-error">El nombre es obligatorio.</small>
+                  }
+                </label>
+
+                <label class="field">
+                  <span>Teléfono</span>
+                  <input type="tel" formControlName="phone" placeholder="Ej. 5512345678" />
+                  @if (
+                    prospectForm.controls.phone.touched && prospectForm.controls.phone.invalid
+                  ) {
+                    <small class="field-error">El teléfono es obligatorio.</small>
+                  }
+                </label>
+
+                <label class="field">
+                  <span>Correo electrónico</span>
+                  <input type="email" formControlName="email" placeholder="correo@ejemplo.com" />
+                  @if (
+                    prospectForm.controls.email.touched && prospectForm.controls.email.invalid
+                  ) {
+                    <small class="field-error">Ingresa un correo válido.</small>
+                  }
+                </label>
+              </div>
+
+              <div class="modal-actions">
+                <button class="secondary-button" type="button" (click)="closeProspectModal()">
+                  Cancelar
+                </button>
+                <button class="secondary-button" type="submit" [disabled]="isCreatingProspect()">
+                  {{ isCreatingProspect() ? 'Registrando…' : 'Registrar prospecto' }}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      }
 
       <dl class="summary-grid">
         <div>
@@ -256,174 +416,6 @@
         </div>
       }
 
-      <div class="save-panel">
-        <div class="section-heading save-heading">
-          <div>
-            <p class="eyebrow">PROSPECTO Y GUARDADO</p>
-            <h2>Asocia la cotización a un prospecto</h2>
-          </div>
-          @if (selectedProspect(); as selected) {
-            <span class="selection-pill">{{ selected.fullName }}</span>
-          }
-        </div>
-
-        <div class="field">
-          <span>Buscar prospecto activo</span>
-          <div class="search-row">
-            <input
-              type="search"
-              [formControl]="prospectSearchControl"
-              placeholder="Nombre o correo"
-              aria-label="Buscar prospecto"
-            />
-            <button
-              class="secondary-button"
-              type="button"
-              [disabled]="isSearchingProspects()"
-              (click)="searchProspects()"
-            >
-              {{ isSearchingProspects() ? 'Buscando…' : 'Buscar' }}
-            </button>
-          </div>
-        </div>
-
-        @if (prospects().length > 0) {
-          <div class="prospect-list" role="listbox" aria-label="Prospectos activos">
-            @for (prospect of prospects(); track prospect.id) {
-              <button
-                class="prospect-option"
-                type="button"
-                [class.selected]="selectedProspect()?.id === prospect.id"
-                (click)="selectProspect(prospect)"
-              >
-                <strong>{{ prospect.fullName }}</strong>
-                <span>{{ prospect.phone }}</span>
-                <small>{{ prospect.email }}</small>
-              </button>
-            }
-          </div>
-        } @else if (!isSearchingProspects() && prospectSearchControl.value.trim()) {
-          <p class="empty-state">No se encontraron prospectos activos para esa búsqueda.</p>
-        }
-
-        @if (selectedProspect(); as selected) {
-          <p class="selected-prospect">
-            Prospecto seleccionado: <strong>{{ selected.fullName }}</strong> · {{ selected.email }}
-          </p>
-        }
-
-        @if (prospectErrorMessage()) {
-          <div class="error-message" role="alert">{{ prospectErrorMessage() }}</div>
-        }
-
-        <div class="prospect-action-row">
-          <button class="secondary-button" type="button" (click)="openProspectModal()">
-            Registrar nuevo prospecto
-          </button>
-        </div>
-
-        @if (isProspectModalOpen()) {
-          <div class="prospect-modal-backdrop" (click)="closeProspectModal()">
-            <div
-              class="prospect-modal"
-              role="dialog"
-              aria-modal="true"
-              aria-labelledby="new-prospect-title"
-              (click)="$event.stopPropagation()"
-            >
-              <div class="modal-header">
-                <h3 id="new-prospect-title">Registrar nuevo prospecto</h3>
-                <button
-                  class="close-button"
-                  type="button"
-                  aria-label="Cerrar modal"
-                  (click)="closeProspectModal()"
-                >
-                  ×
-                </button>
-              </div>
-
-              <form
-                class="prospect-form"
-                [formGroup]="prospectForm"
-                (ngSubmit)="createProspect()"
-                novalidate
-              >
-                <div class="form-grid inline-grid">
-                  <label class="field">
-                    <span>Nombre</span>
-                    <input type="text" formControlName="fullName" placeholder="Nombre completo" />
-                    @if (
-                      prospectForm.controls.fullName.touched &&
-                      prospectForm.controls.fullName.invalid
-                    ) {
-                      <small class="field-error">El nombre es obligatorio.</small>
-                    }
-                  </label>
-
-                  <label class="field">
-                    <span>Teléfono</span>
-                    <input type="tel" formControlName="phone" placeholder="Ej. 5512345678" />
-                    @if (
-                      prospectForm.controls.phone.touched && prospectForm.controls.phone.invalid
-                    ) {
-                      <small class="field-error">El teléfono es obligatorio.</small>
-                    }
-                  </label>
-
-                  <label class="field">
-                    <span>Correo electrónico</span>
-                    <input type="email" formControlName="email" placeholder="correo@ejemplo.com" />
-                    @if (
-                      prospectForm.controls.email.touched && prospectForm.controls.email.invalid
-                    ) {
-                      <small class="field-error">Ingresa un correo válido.</small>
-                    }
-                  </label>
-                </div>
-
-                <div class="modal-actions">
-                  <button class="secondary-button" type="button" (click)="closeProspectModal()">
-                    Cancelar
-                  </button>
-                  <button class="secondary-button" type="submit" [disabled]="isCreatingProspect()">
-                    {{ isCreatingProspect() ? 'Registrando…' : 'Registrar prospecto' }}
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        }
-
-        @if (saveErrorMessage()) {
-          <div class="error-message" role="alert">{{ saveErrorMessage() }}</div>
-        }
-
-        @if (saveSuccessMessage()) {
-          <div class="success-message" role="status">{{ saveSuccessMessage() }}</div>
-        }
-
-        <button
-          class="save-button"
-          type="button"
-          [disabled]="isSavingQuote() || !selectedProspect()"
-          (click)="saveQuote()"
-        >
-          {{ isSavingQuote() ? 'Guardando cotización…' : 'Guardar cotización' }}
-        </button>
-      </div>
-
-      <button
-        class="download-button"
-        type="button"
-        [disabled]="isDownloadingPdf()"
-        (click)="downloadPdf()"
-      >
-        {{ isDownloadingPdf() ? 'Preparando PDF…' : 'Descargar cotización en PDF' }}
-      </button>
-      @if (downloadErrorMessage()) {
-        <div class="error-message download-error" role="alert">{{ downloadErrorMessage() }}</div>
-      }
     </section>
   }
 </main>

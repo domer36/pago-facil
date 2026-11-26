@@ -66,6 +66,30 @@
   padding: 2.8rem 0 4rem;
 }
 
+.page-shell.has-quote {
+  padding-top: 1.25rem;
+}
+
+.quote-toolbar,
+.quote-toolbar-actions {
+  display: flex;
+  align-items: center;
+}
+
+.quote-toolbar {
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.quote-toolbar-actions {
+  gap: 0.75rem;
+}
+
+.quote-feedback {
+  margin: 0 0 0.75rem;
+}
+
 .page-header {
   display: flex;
   align-items: flex-end;
@@ -251,6 +275,11 @@ h2 {
   box-shadow: 0 18px 50px rgb(23 61 54 / 7%);
 }
 
+.page-shell.has-quote .results-card {
+  margin-top: 0;
+  padding: 1.25rem 1.5rem 1.5rem;
+}
+
 .calculator-card {
   padding: 1.5rem;
   border: 1px solid #dfe9e5;
@@ -308,6 +337,43 @@ h2 {
   display: flex;
   align-items: center;
   gap: 0.75rem;
+}
+
+.amortization-heading {
+  align-items: center;
+  margin-bottom: 1.25rem;
+}
+
+.amortization-title {
+  display: grid;
+  flex: 0 0 auto;
+  gap: 0.3rem;
+}
+
+.amortization-title .eyebrow {
+  margin-bottom: 0;
+}
+
+.amortization-title h2 {
+  font-size: clamp(1.35rem, 2.4vw, 1.8rem);
+}
+
+.amortization-title .intro {
+  font-size: 0.82rem;
+}
+
+.amortization-title .result-type {
+  justify-self: start;
+  margin-top: 0.25rem;
+}
+
+.prospect-controls {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  flex: 1;
 }
 
 .form-grid {
@@ -407,38 +473,41 @@ h2 {
   font-size: 0.82rem;
 }
 
-.save-panel {
-  margin-top: 1.5rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid #e3efe9;
-}
-
-.save-heading {
-  margin-bottom: 1rem;
-}
-
-.selection-pill {
-  padding: 0.45rem 0.7rem;
-  border-radius: 999px;
-  background: #edf7f3;
-  color: #267466;
-  font-size: 0.8rem;
-  font-weight: 700;
-}
-
 .search-row {
   display: flex;
+  min-width: 0;
   gap: 0.75rem;
 }
 
 .search-row input {
   flex: 1;
+  min-width: 0;
+  min-height: 2.9rem;
+  padding: 0.65rem 0.8rem;
+  border: 1px solid #d2dfda;
+  border-radius: 0.6rem;
+  background: #fff;
+  color: #213b35;
+  font: inherit;
+  font-size: 0.82rem;
 }
 
-.prospect-action-row {
-  display: flex;
-  justify-content: flex-start;
-  margin-top: 1rem;
+.search-row input:focus {
+  border-color: #16816e;
+  outline: 3px solid rgb(22 129 110 / 16%);
+}
+
+.prospect-controls .secondary-button {
+  min-width: 0;
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+.add-prospect-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
 }
 
 .prospect-modal-backdrop {
@@ -601,11 +670,24 @@ button {
 }
 
 .edit-button {
-  background: #1f8a7a;
+  min-width: 0;
+  min-height: 2.5rem;
+  padding: 0.4rem 0;
+  border-radius: 0;
+  background: transparent;
+  color: #167c69;
 }
 
-.save-button {
-  margin-top: 0.5rem;
+.edit-button:hover:not(:disabled) {
+  transform: none;
+  background: transparent;
+  color: #106756;
+  text-decoration: underline;
+}
+
+.quote-toolbar .save-button {
+  min-width: 0;
+  margin: 0;
 }
 
 button:hover:not(:disabled) {
@@ -614,10 +696,6 @@ button:hover:not(:disabled) {
 }
 
 .secondary-button:hover:not(:disabled) {
-  background: #12715e;
-}
-
-.edit-button:hover:not(:disabled) {
   background: #12715e;
 }
 
@@ -702,11 +780,7 @@ tbody th {
 }
 
 .download-button {
-  margin-top: 1.25rem;
-}
-
-.download-error {
-  margin: 1rem 0 0;
+  margin: 0;
 }
 
 @media (max-width: 720px) {
@@ -729,6 +803,14 @@ tbody th {
 
   .summary-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .amortization-heading {
+    align-items: stretch;
+  }
+
+  .prospect-controls {
+    justify-content: flex-start;
   }
 }
 
@@ -780,7 +862,31 @@ tbody th {
     flex-direction: column;
   }
 
-  .result-actions {
+  .quote-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .quote-toolbar-actions {
+    align-items: stretch;
     flex-wrap: wrap;
+  }
+
+  .quote-toolbar-actions button {
+    flex: 1;
+  }
+
+  .prospect-controls {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .prospect-controls .search-row {
+    width: 100%;
+  }
+
+  .prospect-controls .add-prospect-button {
+    align-self: flex-start;
   }
 }
