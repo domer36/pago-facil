@@ -10,19 +10,75 @@ en `specs/`, trabajo dividido en `specs/*/tasks/`.
 
 ## Arquitectura
 
-- `backend/quote-generator`: API NestJS. El código de cotizaciones se organiza
-  por funcionalidad (`src/features/quotes/`) en dominio, aplicación y
-  presentación.
-- `frontend/webapp`: Angular. La funcionalidad de cotización está en
-  `src/app/features/quote/`, separada en dominio, aplicación, infraestructura y
-  presentación.
-- `compose.yaml`: inicia ambos servicios. El frontend sirve la aplicación con
-  Nginx y enruta las solicitudes al backend; el acceso local es
-  `http://localhost:4200`.
+- `frontend/webapp`: aplicación Angular servida por Nginx. Nginx enruta
+  `/quotes` a `backend`, `/customers` a `customers` y `/documents/` a
+  `pdf-generator`; el acceso local es `http://localhost:4200`.
+- `backend/quote-generator`: API NestJS para calcular y guardar cotizaciones.
+  Su código está organizado por funcionalidad (`src/features/quotes/`) en
+  dominio, aplicación, infraestructura y presentación.
+- `backend/customers`: API NestJS para administrar y buscar prospectos; sigue
+  la misma separación por capas y funcionalidad.
+- `backend/pdf-generator`: API NestJS para generar documentos de cotización,
+  organizada en la funcionalidad `documents`.
+- `database`: migraciones SQL de Flyway para PostgreSQL. Actualmente los
+  servicios `backend` y `customers` usan la instancia y el esquema compartidos;
+  `pdf-generator` no tiene conexión configurada a la base de datos.
+- `compose.yaml`: orquesta PostgreSQL, la ejecución de migraciones Flyway, las
+  tres APIs y el frontend dentro de la red de Compose. Los servicios se
+  comunican usando sus nombres de servicio; publica puertos al host solo cuando
+  sea necesario para el desarrollo o acceso externo.
 
 Mantén la lógica financiera y la validación autoritativa en el backend. El
 frontend recopila datos, invoca el gateway HTTP y presenta la respuesta y los
 errores recibidos; no dupliques allí los cálculos financieros.
+
+## Microservicios y Docker Compose
+
+- Los servicios de backend nuevos deben ser aplicaciones NestJS independientes,
+  creadas bajo `backend/<nombre-del-servicio>` y con su propio `package.json`,
+  lockfile, configuración Nest/TypeScript, pruebas y `Dockerfile`. Mantén las
+  convenciones de capas y formato de los servicios existentes; no agregues otro
+  framework o runtime para un microservicio nuevo.
+- Mantén cada servicio enfocado en su responsabilidad y expón su funcionalidad
+  mediante una API explícita. No importes directamente código interno de otro
+  servicio; integra servicios por HTTP u otro contrato explícito cuando sea
+  necesario.
+- Agrega cada servicio a `compose.yaml` con el contexto de build correcto, su
+  puerto de aplicación y las dependencias de arranque necesarias. Usa
+  `expose` para comunicación interna y `ports` solo si hace falta acceder desde
+  el host. Si el frontend debe consumirlo, agrega la ruta correspondiente en
+  `frontend/webapp/nginx.conf` y usa una URL relativa desde Angular.
+- Configura las dependencias de salud/arranque según lo que el servicio
+  realmente necesita. Si conecta a PostgreSQL, usa el hostname `postgres` y
+  las variables de entorno existentes; espera a que PostgreSQL esté saludable y
+  a que Flyway termine correctamente cuando necesite el esquema migrado.
+- No copies secretos ni credenciales reales a código, Dockerfiles o archivos
+  versionados. Usa variables de entorno y conserva valores locales de ejemplo
+  seguros.
+
+## Base de datos y migraciones
+
+- PostgreSQL es la base de datos actual. Todas las modificaciones de esquema
+  deben ser migraciones SQL versionadas de Flyway en `database/migrations/`,
+  con el formato `V<numero>__<descripcion_en_snake_case>.sql` (por ejemplo,
+  `V2__add_prospect_status.sql`). Usa un número de versión nuevo y único,
+  posterior a las migraciones existentes.
+- Flyway aplica las migraciones desde el servicio `flyway` de Compose antes de
+  iniciar los servicios que dependen del esquema. No cambies el esquema
+  manualmente ni uses sincronización automática del esquema desde una API.
+- Una migración que ya se aplicó en un entorno compartido o desplegado es
+  inmutable: no la edites ni la renombres. Corrige el esquema con una migración
+  nueva. Diseña los cambios como evoluciones compatibles cuando sea posible
+  (agregar y poblar antes de retirar o renombrar datos) para permitir despliegues
+  coordinados.
+- Ten presente que las migraciones actuales se ejecutan contra una base y un
+  esquema compartidos por `backend` y `customers`. Coordina cambios entre ambos
+  y no asumas que cada servicio tiene una base aislada. Si se propone separar
+  bases o esquemas, actualiza primero el diseño, la configuración, las
+  migraciones y las instrucciones operativas afectadas.
+- Revisa tanto el SQL como el comportamiento de los servicios que usan las
+  tablas modificadas. Verifica el arranque integrado con `docker compose up
+  --build` y revisa los logs de `flyway` y de los servicios afectados.
 
 ## Reglas de negocio que no se deben cambiar incidentalmente
 
@@ -47,33 +103,32 @@ Para desarrollo integrado, desde la raíz:
 docker compose up --build
 ```
 
-Para validar cambios en un solo componente, ejecuta sus comandos desde su
-directorio:
+Para validar cambios en un solo componente, ejecuta desde la raíz los comandos
+del componente afectado:
 
 ```bash
-# Backend
-cd backend/quote-generator
-npm test
-npm run test:e2e
-npm run lint
-npm run build
+# API de cotizaciones
+(cd backend/quote-generator && npm test && npm run test:e2e && npm run lint && npm run build)
+
+# API de prospectos
+(cd backend/customers && npm test && npm run test:e2e && npm run lint && npm run build)
+
+# API de documentos
+(cd backend/pdf-generator && npm test && npm run test:e2e && npm run lint && npm run build)
 
 # Frontend
-cd frontend/webapp
-npm test
-npm run build
+(cd frontend/webapp && npm test && npm run build)
 ```
 
-El backend usa Vitest para pruebas unitarias y e2e; el frontend ejecuta sus
-pruebas unitarias con Angular/Vitest. Ejecuta las pruebas pertinentes al cambio
-y no afirmes que pasaron si no las ejecutaste.
+Las APIs NestJS usan Vitest para pruebas unitarias y e2e; el frontend ejecuta
+sus pruebas unitarias con Angular/Vitest. Ejecuta las pruebas pertinentes a los
+servicios y capas afectados y no afirmes que pasaron si no las ejecutaste.
 
 ## Flujo de trabajo
 
 - Para funcionalidad nueva o cambios de alcance, revisa y actualiza la
   especificación y las tareas SDD correspondientes antes de implementar.
-- Las instrucciones del backend en
-  [`backend/quote-generator/AGENTS.md`](backend/quote-generator/AGENTS.md)
-  complementan esta guía para trabajo dentro de ese componente.
+- Las instrucciones específicas de un componente complementan esta guía;
+  léelas antes de cambiar ese componente.
 - Conserva el idioma español de la interfaz y los mensajes orientados al usuario.
 - Evita añadir dependencias si la solución puede seguir los patrones existentes.
