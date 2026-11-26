@@ -14,62 +14,92 @@
 }
 
 .topbar-inner {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
+  display: flex;
   align-items: center;
-  width: min(1120px, calc(100% - 2rem));
-  min-height: 4.5rem;
+  width: min(1200px, calc(100% - 2rem));
+  min-height: 4rem;
   margin: 0 auto;
   padding: 0.5rem 0;
 }
 
-.brand-block,
-.user-block {
+.brand-block {
   display: flex;
   align-items: center;
-}
-
-.user-block {
-  justify-content: flex-end;
+  gap: 0.55rem;
+  padding-right: 1.5rem;
+  border-right: 1px solid #dfe9e5;
 }
 
 .brand-mark,
-.product-block,
-.user-block {
+.product-block {
   color: #143b36;
   font-weight: 800;
 }
 
+.brand-symbol {
+  display: grid;
+  width: 1.8rem;
+  height: 1.8rem;
+  place-items: center;
+  border-radius: 0.55rem;
+  background: #087764;
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 800;
+  transform: rotate(-7deg);
+}
+
 .brand-mark {
-  font-size: 1.1rem;
+  font-size: 1.25rem;
   letter-spacing: -0.03em;
 }
 
 .product-block {
-  justify-self: center;
-  color: #196b5b;
-  font-size: 0.96rem;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-
-.user-block {
-  font-size: 0.92rem;
-  letter-spacing: 0.02em;
+  margin-left: 1.25rem;
+  color: #73827d;
+  font-size: 0.82rem;
 }
 
 .page-shell {
-  width: min(1120px, calc(100% - 2rem));
+  width: min(1200px, calc(100% - 2rem));
   margin: 0 auto;
-  padding: 2.5rem 0 4rem;
+  padding: 2.8rem 0 4rem;
+}
+
+.page-shell.has-quote {
+  padding-top: 1.25rem;
+}
+
+.quote-toolbar,
+.quote-toolbar-actions {
+  display: flex;
+  align-items: center;
+}
+
+.quote-toolbar {
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.quote-toolbar-actions {
+  gap: 0.75rem;
+}
+
+.quote-feedback {
+  margin: 0 0 0.75rem;
 }
 
 .page-header {
-  margin-bottom: 2rem;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 2.2rem;
 }
 
 .eyebrow {
-  margin: 0 0 0.6rem;
+  margin: 0 0 0.8rem;
   color: #167c69;
   font-size: 0.72rem;
   font-weight: 800;
@@ -83,27 +113,159 @@ p {
 }
 
 h1 {
-  margin-bottom: 0.65rem;
+  margin-bottom: 0.45rem;
   color: #143b36;
-  font-size: clamp(2rem, 5vw, 3.2rem);
-  letter-spacing: -0.045em;
+  font-size: clamp(2rem, 4vw, 2.75rem);
+  letter-spacing: -0.055em;
 }
 
 h2 {
   margin-bottom: 0;
   color: #143b36;
-  font-size: 1.35rem;
+  font-size: 1.1rem;
 }
 
 .intro {
   max-width: 42rem;
   margin-bottom: 0;
   color: #5d706b;
-  font-size: 1.05rem;
+  font-size: 0.95rem;
   line-height: 1.6;
 }
 
-.calculator-card,
+.instant-badge {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 0.9rem;
+  border: 1px solid #d8e9e3;
+  border-radius: 999px;
+  background: #fff;
+  color: #267466;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.instant-badge span {
+  font-size: 1rem;
+}
+
+.product-selection {
+  margin-bottom: 1.25rem;
+}
+
+.step-label {
+  margin: 0 0 0.8rem;
+  color: #233d37;
+  font-size: 0.82rem;
+  font-weight: 750;
+}
+
+.product-options {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.8rem;
+}
+
+.product-option {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  min-height: 5.2rem;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid #dfe9e5;
+  border-radius: 0.9rem;
+  background: #fff;
+  color: #203b35;
+  cursor: pointer;
+  transition:
+    border-color 150ms ease,
+    box-shadow 150ms ease,
+    background 150ms ease;
+}
+
+.product-option:has(input:checked) {
+  border-color: #16816e;
+  box-shadow: 0 0 0 1px #16816e;
+}
+
+.product-option:focus-within {
+  outline: 3px solid rgb(22 129 110 / 16%);
+}
+
+.product-option input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.product-icon {
+  display: grid;
+  width: 2.5rem;
+  height: 2.5rem;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 0.65rem;
+  background: #edf4f1;
+  color: #6a8179;
+}
+
+.product-option:has(input:checked) .product-icon {
+  background: #d8f4e9;
+  color: #087764;
+}
+
+.product-icon svg {
+  width: 1.35rem;
+  height: 1.35rem;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.7;
+}
+
+.product-copy {
+  display: grid;
+  min-width: 0;
+  gap: 0.2rem;
+}
+
+.product-copy strong {
+  font-size: 0.85rem;
+}
+
+.product-copy small {
+  color: #71817b;
+  font-size: 0.72rem;
+}
+
+.product-radio {
+  display: grid;
+  width: 1.05rem;
+  height: 1.05rem;
+  flex: 0 0 auto;
+  place-items: center;
+  margin-left: auto;
+  border: 1px solid #c9d8d2;
+  border-radius: 50%;
+}
+
+.product-option:has(input:checked) .product-radio {
+  border: 2px solid #16816e;
+}
+
+.product-option:has(input:checked) .product-radio::after {
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 50%;
+  background: #16816e;
+  content: '';
+}
+
 .results-card {
   margin-top: 1.5rem;
   padding: clamp(1.25rem, 4vw, 2rem);
@@ -113,15 +275,54 @@ h2 {
   box-shadow: 0 18px 50px rgb(23 61 54 / 7%);
 }
 
+.page-shell.has-quote .results-card {
+  margin-top: 0;
+  padding: 1.25rem 1.5rem 1.5rem;
+}
+
+.calculator-card {
+  padding: 1.5rem;
+  border: 1px solid #dfe9e5;
+  border-radius: 1.1rem;
+  background: #fff;
+  box-shadow: 0 14px 36px rgb(23 61 54 / 6%);
+}
+
 .section-heading {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: 1rem;
-  margin-bottom: 1.75rem;
+  margin-bottom: 1.25rem;
+  padding-bottom: 1.1rem;
+  border-bottom: 1px solid #e8efec;
 }
 
-.currency-note,
+.form-title-group {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.form-title-group > div p {
+  margin: 0.25rem 0 0;
+  color: #72817b;
+  font-size: 0.78rem;
+}
+
+.step-number {
+  display: grid;
+  width: 1.75rem;
+  height: 1.75rem;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 0.55rem;
+  background: #087764;
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
 .result-type {
   padding: 0.45rem 0.7rem;
   border-radius: 999px;
@@ -132,31 +333,77 @@ h2 {
   white-space: nowrap;
 }
 
+.result-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.amortization-heading {
+  align-items: center;
+  margin-bottom: 1.25rem;
+}
+
+.amortization-title {
+  display: grid;
+  flex: 0 0 auto;
+  gap: 0.3rem;
+}
+
+.amortization-title .eyebrow {
+  margin-bottom: 0;
+}
+
+.amortization-title h2 {
+  font-size: clamp(1.35rem, 2.4vw, 1.8rem);
+}
+
+.amortization-title .intro {
+  font-size: 0.82rem;
+}
+
+.amortization-title .result-type {
+  justify-self: start;
+  margin-top: 0.25rem;
+}
+
+.prospect-controls {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  flex: 1;
+}
+
 .form-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1.25rem;
+  column-gap: 1rem;
+  row-gap: 1.25rem;
 }
 
 .field {
   display: grid;
   align-content: start;
-  gap: 0.5rem;
+  gap: 0.4rem;
   color: #283f3a;
-  font-size: 0.9rem;
+  font-size: 0.78rem;
   font-weight: 700;
 }
 
 .field input,
 .field select {
   width: 100%;
-  min-height: 3rem;
-  padding: 0.7rem 0.85rem;
-  border: 1px solid #cbd9d4;
-  border-radius: 0.65rem;
+  min-height: 2.9rem;
+  padding: 0.65rem 0.8rem;
+  border: 1px solid #d2dfda;
+  border-radius: 0.6rem;
   background: #fff;
   color: #213b35;
   font: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
 }
 
 .field input:focus,
@@ -165,51 +412,102 @@ h2 {
   outline: 3px solid rgb(22 129 110 / 16%);
 }
 
+.field-help {
+  color: #16816e;
+  font-size: 0.68rem;
+  font-weight: 600;
+}
+
+.rate-input {
+  display: flex;
+  min-height: 2.9rem;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.65rem 0.8rem;
+  border: 1px solid #dbe5e1;
+  border-radius: 0.6rem;
+  background: #f1f5f3;
+  color: #82918b;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.rate-input small {
+  font-size: 0.68rem;
+  font-weight: 500;
+}
+
 .field-error {
   color: #aa312c;
   font-size: 0.78rem;
   font-weight: 500;
 }
 
+.form-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1.4rem;
+  padding-top: 1.1rem;
+  border-top: 1px solid #e8efec;
+}
+
 .form-hint {
-  margin: 1rem 0 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
   color: #65756f;
-  font-size: 0.82rem;
+  font-size: 0.72rem;
   line-height: 1.5;
 }
 
-.save-panel {
-  margin-top: 1.5rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid #e3efe9;
-}
-
-.save-heading {
-  margin-bottom: 1rem;
-}
-
-.selection-pill {
-  padding: 0.45rem 0.7rem;
-  border-radius: 999px;
-  background: #edf7f3;
-  color: #267466;
-  font-size: 0.8rem;
-  font-weight: 700;
+.form-footer button {
+  display: inline-flex;
+  min-width: 9rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  padding: 0.7rem 1rem;
+  font-size: 0.82rem;
 }
 
 .search-row {
   display: flex;
+  min-width: 0;
   gap: 0.75rem;
 }
 
 .search-row input {
   flex: 1;
+  min-width: 0;
+  min-height: 2.9rem;
+  padding: 0.65rem 0.8rem;
+  border: 1px solid #d2dfda;
+  border-radius: 0.6rem;
+  background: #fff;
+  color: #213b35;
+  font: inherit;
+  font-size: 0.82rem;
 }
 
-.prospect-action-row {
-  display: flex;
-  justify-content: flex-start;
-  margin-top: 1rem;
+.search-row input:focus {
+  border-color: #16816e;
+  outline: 3px solid rgb(22 129 110 / 16%);
+}
+
+.prospect-controls .secondary-button {
+  min-width: 0;
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+.add-prospect-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
 }
 
 .prospect-modal-backdrop {
@@ -371,8 +669,25 @@ button {
   background: #1f8a7a;
 }
 
-.save-button {
-  margin-top: 0.5rem;
+.edit-button {
+  min-width: 0;
+  min-height: 2.5rem;
+  padding: 0.4rem 0;
+  border-radius: 0;
+  background: transparent;
+  color: #167c69;
+}
+
+.edit-button:hover:not(:disabled) {
+  transform: none;
+  background: transparent;
+  color: #106756;
+  text-decoration: underline;
+}
+
+.quote-toolbar .save-button {
+  min-width: 0;
+  margin: 0;
 }
 
 button:hover:not(:disabled) {
@@ -465,11 +780,7 @@ tbody th {
 }
 
 .download-button {
-  margin-top: 1.25rem;
-}
-
-.download-error {
-  margin: 1rem 0 0;
+  margin: 0;
 }
 
 @media (max-width: 720px) {
@@ -478,28 +789,69 @@ tbody th {
     padding-top: 2rem;
   }
 
+  .page-header {
+    align-items: flex-start;
+  }
+
+  .product-options {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .product-option:last-child {
+    grid-column: 1 / -1;
+  }
+
   .summary-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .amortization-heading {
+    align-items: stretch;
+  }
+
+  .prospect-controls {
+    justify-content: flex-start;
   }
 }
 
 @media (max-width: 480px) {
   .topbar-inner {
+    min-height: 3.5rem;
+  }
+
+  .brand-block {
+    padding-right: 0.8rem;
+  }
+
+  .product-block {
+    margin-left: 0.8rem;
+    font-size: 0.72rem;
+  }
+
+  .page-shell {
+    padding-top: 1.5rem;
+  }
+
+  .page-header {
+    flex-direction: column;
+    margin-bottom: 1.5rem;
+  }
+
+  .product-options {
     grid-template-columns: 1fr;
-    justify-items: start;
-    gap: 0.2rem;
-    padding: 0.75rem 0;
   }
 
-  .brand-block,
-  .user-block,
-  .product-block {
-    justify-self: start;
+  .product-option:last-child {
+    grid-column: auto;
   }
 
-  .product-block {
-    font-size: 0.82rem;
-    letter-spacing: 0.02em;
+  .calculator-card {
+    padding: 1.1rem;
+  }
+
+  .form-footer {
+    align-items: stretch;
+    flex-direction: column;
   }
 
   .form-grid {
@@ -508,5 +860,33 @@ tbody th {
 
   .section-heading {
     flex-direction: column;
+  }
+
+  .quote-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .quote-toolbar-actions {
+    align-items: stretch;
+    flex-wrap: wrap;
+  }
+
+  .quote-toolbar-actions button {
+    flex: 1;
+  }
+
+  .prospect-controls {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .prospect-controls .search-row {
+    width: 100%;
+  }
+
+  .prospect-controls .add-prospect-button {
+    align-self: flex-start;
   }
 }

@@ -39,21 +39,44 @@ describe('QuotePageComponent', () => {
     const host = fixture.nativeElement as HTMLElement;
 
     expect(host.querySelector('.download-button')).toBeNull();
-    expect(host.querySelectorAll('select[formControlName="type"] option')).toHaveLength(3);
+    expect(host.querySelectorAll('input[type="radio"][formControlName="type"]')).toHaveLength(3);
     expect(host.querySelector('input[formControlName="residualPercentage"]')).toBeNull();
+    expect(host.querySelector('.rate-input')?.textContent?.trim()).toContain('35%');
     expect(
       Array.from(host.querySelectorAll('select[formControlName="termMonths"] option')).map(
         (option) => option.textContent?.trim().replace(' meses', ''),
       ),
     ).toEqual(['6', '12', '18', '24', '36', '48']);
 
-    fixture.componentInstance.form.controls.type.setValue('arrendamiento');
+    (host.querySelector('input[type="radio"][value="arrendamiento"]') as HTMLInputElement).click();
     fixture.detectChanges();
     expect(host.querySelector('input[formControlName="residualPercentage"]')).not.toBeNull();
+    expect(host.querySelector('.rate-input')?.textContent?.trim()).toContain('27%');
 
-    fixture.componentInstance.form.controls.type.setValue('msi');
+    (host.querySelector('input[type="radio"][value="msi"]') as HTMLInputElement).click();
     fixture.detectChanges();
     expect(host.querySelector('input[formControlName="residualPercentage"]')).toBeNull();
+    expect(host.querySelector('.rate-input')?.textContent?.trim()).toContain('0%');
+  });
+
+  it('shows only the result after quoting and returns to the form without losing inputs', () => {
+    const fixture = TestBed.createComponent(QuotePageComponent);
+    const component = fixture.componentInstance;
+    const host = fixture.nativeElement as HTMLElement;
+    component.form.patchValue({ totalValue: 150_000, downPaymentPercentage: 10 });
+    component.quote.set(createQuote('credito-simple', null));
+    fixture.detectChanges();
+
+    expect(host.querySelector('.calculator-card')).toBeNull();
+    expect(host.querySelector('.results-card')).not.toBeNull();
+
+    (host.querySelector('.edit-button') as HTMLButtonElement).click();
+    fixture.detectChanges();
+
+    expect(host.querySelector('.calculator-card')).not.toBeNull();
+    expect(host.querySelector('.results-card')).toBeNull();
+    expect(component.form.controls.totalValue.value).toBe(150_000);
+    expect(component.form.controls.downPaymentPercentage.value).toBe(10);
   });
 
   it('limits prospect search results to ten and allows selecting one', async () => {
@@ -68,7 +91,9 @@ describe('QuotePageComponent', () => {
     await new Promise((resolve) => setTimeout(resolve, 300));
     fixture.detectChanges();
 
-    const request = httpTesting.expectOne((req) => req.url === '/customers' && req.params.get('search') === 'ana');
+    const request = httpTesting.expectOne(
+      (req) => req.url === '/customers' && req.params.get('search') === 'ana',
+    );
     const prospects = Array.from({ length: 12 }, (_, index) => ({
       id: `pro-${index + 1}`,
       fullName: `Ana ${index + 1}`,
@@ -109,9 +134,9 @@ describe('QuotePageComponent', () => {
     component.createProspect();
     fixture.detectChanges();
 
-    expect((fixture.nativeElement as HTMLElement).querySelector('[role="alert"]')?.textContent).toContain(
-      'Completa nombre, teléfono y correo para registrar el prospecto.',
-    );
+    expect(
+      (fixture.nativeElement as HTMLElement).querySelector('[role="alert"]')?.textContent,
+    ).toContain('Completa nombre, teléfono y correo para registrar el prospecto.');
 
     component.prospectForm.setValue({
       fullName: 'Luis Pérez',
@@ -129,9 +154,9 @@ describe('QuotePageComponent', () => {
     );
     fixture.detectChanges();
 
-    expect((fixture.nativeElement as HTMLElement).querySelector('[role="alert"]')?.textContent).toContain(
-      'Ya existe un prospecto registrado con ese correo electrónico.',
-    );
+    expect(
+      (fixture.nativeElement as HTMLElement).querySelector('[role="alert"]')?.textContent,
+    ).toContain('Ya existe un prospecto registrado con ese correo electrónico.');
     expect(component.isProspectModalOpen()).toBe(true);
   });
 
@@ -252,6 +277,7 @@ describe('QuotePageComponent', () => {
   it('shows backend validation errors and removes any previous quote', () => {
     const fixture = TestBed.createComponent(QuotePageComponent);
     const component = fixture.componentInstance;
+    fixture.detectChanges();
     const form = fixture.nativeElement.querySelector('form') as HTMLFormElement;
     component.form.patchValue({ totalValue: 150_000 });
     fixture.detectChanges();

@@ -13,6 +13,7 @@ Actualizar la pantalla separada de resultado para presentar el resumen de la cot
 
 ## To do
 - [ ] Rediseñar el resumen y la tabla completa de amortización siguiendo la referencia visual, conservando los datos y el orden de pagos existentes.
+- [x] Mostrar el resultado sin el formulario y ofrecer «Editar cotización» para volver al formulario conservando los datos capturados.
 - [ ] Mantener disponibles las acciones de guardado y descarga PDF con sus estados, confirmaciones y errores en español.
 - [ ] Adaptar el resultado y la tabla a escritorio, tableta y móvil; mantener la tabla consultable sin desbordar horizontalmente la página a 360 px.
 
@@ -20,3 +21,4 @@ Actualizar la pantalla separada de resultado para presentar el resumen de la cot
 - [ ] Ejecutar las pruebas unitarias del frontend y `npm run build` desde `frontend/webapp`.
 - [ ] Verificar visualmente a 1280 px, 768 px y 360 px que el resumen, las acciones y la tabla son utilizables, sin desbordamiento horizontal de página a 360 px.
 - [ ] Confirmar que guardar y descargar siguen usando los servicios existentes, que sus fallos se muestran como errores y que la amortización conserva los datos financieros previos.
+- [x] Verificar que la vista de resultado oculte el cotizador y que «Editar cotización» lo muestre sin perder los datos capturados.

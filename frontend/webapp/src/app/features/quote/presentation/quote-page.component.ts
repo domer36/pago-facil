@@ -1,7 +1,7 @@
 import { CurrencyPipe, registerLocaleData } from '@angular/common';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import localeEsMx from '@angular/common/locales/es-MX';
-import { Component, DestroyRef, inject, signal } from '@angular/core';
+import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { debounceTime } from 'rxjs';
@@ -53,6 +53,8 @@ export class QuotePageComponent {
   });
 
   readonly quote = signal<QuoteResponse | null>(null);
+  readonly isEditingQuote = signal(false);
+  readonly visibleQuote = computed(() => (this.isEditingQuote() ? null : this.quote()));
   readonly prospects = signal<Prospect[]>([]);
   readonly selectedProspect = signal<Prospect | null>(null);
   readonly errorMessage = signal('');
@@ -68,6 +70,17 @@ export class QuotePageComponent {
   readonly isProspectModalOpen = signal(false);
   private readonly destroyRef = inject(DestroyRef);
   private readonly http = inject(HttpClient);
+
+  get annualRate(): number {
+    switch (this.form.controls.type.value) {
+      case 'credito-simple':
+        return 35;
+      case 'arrendamiento':
+        return 27;
+      case 'msi':
+        return 0;
+    }
+  }
 
   constructor(
     private readonly createQuote: CreateQuote,
@@ -125,6 +138,7 @@ export class QuotePageComponent {
     this.createQuote.execute(request).subscribe({
       next: (quote) => {
         this.quote.set(quote);
+        this.isEditingQuote.set(false);
         this.isSubmitting.set(false);
       },
       error: (error: unknown) => {
@@ -132,6 +146,10 @@ export class QuotePageComponent {
         this.isSubmitting.set(false);
       },
     });
+  }
+
+  editQuote(): void {
+    this.isEditingQuote.set(true);
   }
 
   searchProspects(): void {
@@ -187,7 +205,9 @@ export class QuotePageComponent {
   createProspect(): void {
     if (this.prospectForm.invalid) {
       this.prospectForm.markAllAsTouched();
-      this.prospectErrorMessage.set('Completa nombre, teléfono y correo para registrar el prospecto.');
+      this.prospectErrorMessage.set(
+        'Completa nombre, teléfono y correo para registrar el prospecto.',
+      );
       return;
     }
 
@@ -248,7 +268,9 @@ export class QuotePageComponent {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
-          this.saveSuccessMessage.set(`Cotización guardada correctamente para ${prospect.fullName}.`);
+          this.saveSuccessMessage.set(
+            `Cotización guardada correctamente para ${prospect.fullName}.`,
+          );
           this.isSavingQuote.set(false);
         },
         error: (error: unknown) => {
