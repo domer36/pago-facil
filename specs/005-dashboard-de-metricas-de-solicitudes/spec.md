@@ -48,7 +48,7 @@ El frontend existente usa Angular y el backend de cotizaciones usa NestJS. Se de
 ## Open questions
 - Confirmar qué zona horaria debe determinar los límites de fecha al filtrar y ordenar cotizaciones.
 
-## Proposed tasks
-- T001 - Proveer métricas agregadas en backend: Consultar cotizaciones persistidas por intervalo y exponer conteos, montos y datos para prospectos frecuentes y solicitudes recientes.
-- T002 - Crear dashboard en frontend: Integrar la vista, el filtro de fechas, las gráficas animadas e interactivas y los listados con estados de carga, vacío y error.
-- T003 - Validar integración del dashboard: Verificar agregados, límites de fecha, listados, presentación de errores y conservación del flujo de cotización.
+## Tasks
+- [ ] [T001 - Proveer métricas agregadas en backend](tasks/T001-proveer-metricas-agregadas-en-backend.md)
+- [ ] [T002 - Crear dashboard en frontend](tasks/T002-crear-dashboard-en-frontend.md)
+- [ ] [T003 - Validar integración del dashboard](tasks/T003-validar-integracion-del-dashboard.md)
