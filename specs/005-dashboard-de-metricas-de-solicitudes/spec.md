@@ -1,5 +1,5 @@
 Name: 005 Dashboard de Métricas de Solicitudes
-Status: Approved
+Status: In progress
 Date: 2026-11-26 16:08
 
 ## Description

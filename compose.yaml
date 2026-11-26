@@ -77,6 +77,25 @@ services:
     expose:
       - "3000"
 
+  dashboard:
+    build:
+      context: ./backend/dashboard
+    depends_on:
+      postgres:
+        condition: service_healthy
+      flyway:
+        condition: service_completed_successfully
+    environment:
+      PORT: 3000
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: ${POSTGRES_DB:-appdb}
+      DB_USER: ${POSTGRES_USER:-appuser}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-app_password}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-appuser}:${POSTGRES_PASSWORD:-app_password}@postgres:5432/${POSTGRES_DB:-appdb}
+    ports:
+      - "3002:3000"
+
   frontend:
     build:
       context: ./frontend/webapp
@@ -84,6 +103,7 @@ services:
       - backend
       - customers
       - pdf-generator
+      - dashboard
     ports:
       - "4200:80"
 
