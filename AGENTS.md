@@ -12,7 +12,8 @@ en `specs/`, trabajo dividido en `specs/*/tasks/`.
 
 - `frontend/webapp`: aplicación Angular servida por Nginx. Nginx enruta
   `/quotes` a `backend`, `/customers` a `customers` y `/documents/` a
-  `pdf-generator`; el acceso local es `http://localhost:4200`.
+  `pdf-generator`, además de `/dashboard` a `dashboard`; el acceso local es
+  `http://localhost:4200`.
 - `backend/quote-generator`: API NestJS para calcular y guardar cotizaciones.
   Su código está organizado por funcionalidad (`src/features/quotes/`) en
   dominio, aplicación, infraestructura y presentación.
@@ -48,6 +49,14 @@ errores recibidos; no dupliques allí los cálculos financieros.
   `expose` para comunicación interna y `ports` solo si hace falta acceder desde
   el host. Si el frontend debe consumirlo, agrega la ruta correspondiente en
   `frontend/webapp/nginx.conf` y usa una URL relativa desde Angular.
+- Los upstreams de Docker en Nginx deben resolverse dinámicamente usando el DNS
+  interno de Compose (`resolver 127.0.0.11`) y una variable en `proxy_pass`.
+  No uses nombres de servicios directamente en `proxy_pass`: Nginx los resuelve
+  al iniciar y puede abortar el arranque del frontend si un servicio todavía no
+  está disponible, como ocurrió al agregar el upstream `dashboard`. Al cambiar
+  rutas proxy, verifica la sintaxis con `docker compose build frontend` y
+  `docker run --rm paga-facil-frontend nginx -t`, además de `docker compose
+  config --quiet`.
 - Configura las dependencias de salud/arranque según lo que el servicio
   realmente necesita. Si conecta a PostgreSQL, usa el hostname `postgres` y
   las variables de entorno existentes; espera a que PostgreSQL esté saludable y
@@ -115,6 +124,9 @@ del componente afectado:
 
 # API de documentos
 (cd backend/pdf-generator && npm test && npm run test:e2e && npm run lint && npm run build)
+
+# API del dashboard
+(cd backend/dashboard && npm test && npm run test:e2e && npm run lint && npm run build)
 
 # Frontend
 (cd frontend/webapp && npm test && npm run build)

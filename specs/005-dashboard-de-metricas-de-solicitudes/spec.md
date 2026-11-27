@@ -18,7 +18,7 @@ Esta especificación agrega al cotizador un dashboard en español para consultar
 - Cambiar cálculos, validaciones, tasas, persistencia o reglas financieras existentes.
 
 ## Requirements
-- R1: La aplicación debe ofrecer una vista de dashboard en español accesible desde la interfaz existente, conservando el flujo actual de cotización.
+- R1: La aplicación debe mostrar el dashboard en español al abrir la ruta inicial y ofrecer desde ahí un botón para crear cotizaciones en una ruta dedicada, conservando el flujo actual.
 - R2: Las métricas del dashboard deben basarse únicamente en cotizaciones guardadas y asociadas a un prospecto.
 - R3: El dashboard debe mostrar métricas para un intervalo de fechas seleccionable, con los últimos 30 días como intervalo inicial. El filtro debe afectar las métricas y gráficas, no las secciones de prospectos frecuentes y solicitudes recientes.
 - R4: El dashboard debe mostrar el número de solicitudes dentro del intervalo seleccionado, desglosado por crédito simple, arrendamiento y MSI, además del total.
@@ -31,7 +31,7 @@ Esta especificación agrega al cotizador un dashboard en español para consultar
 - R11: La presentación debe conservar el idioma español, la legibilidad y la coherencia visual con el resto de la aplicación, incluso cuando las gráficas utilicen animación o interacción.
 
 ## Acceptance criteria
-- [ ] Se puede acceder al dashboard desde la aplicación sin impedir el uso del flujo existente de cotización.
+- [ ] Al abrir la aplicación se muestra el dashboard y el botón «Crear cotización» lleva a la ruta dedicada de creación; el flujo de cotización sigue disponible.
 - [ ] Con cotizaciones guardadas asociadas a prospectos de los tres tipos de financiamiento, las métricas muestran los conteos correctos por tipo y el total.
 - [ ] Para un intervalo seleccionado, los valores agregados de valor total cotizado y monto financiado coinciden con las cotizaciones guardadas asociadas a prospectos dentro de ese intervalo; ambos importes aparecen separados, en total y por tipo, con formato MXN de dos decimales.
 - [ ] Al abrir el dashboard, el intervalo inicial comprende los últimos 30 días. Al cambiar el intervalo, las métricas y gráficas se actualizan, pero las secciones de prospectos frecuentes y solicitudes recientes mantienen sus periodos definidos.
