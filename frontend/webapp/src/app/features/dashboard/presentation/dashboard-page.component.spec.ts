@@ -84,6 +84,54 @@ describe('DashboardPageComponent', () => {
     );
     expect(host.textContent).not.toContain('Solicitudes totales');
   });
+
+  it('shows empty, loading, and MXN states without changing the quote flow', () => {
+    const fixture = TestBed.createComponent(DashboardPageComponent);
+    fixture.detectChanges();
+
+    const host = fixture.nativeElement as HTMLElement;
+    expect(host.textContent).not.toContain('Solicitudes totales');
+
+    httpTesting.expectOne((req) => req.url === '/dashboard/metrics').flush({
+      ...createMetrics(),
+      total: { count: 0, totalValue: 0, financedAmount: 0 },
+      byType: {
+        'credito-simple': { count: 0, totalValue: 0, financedAmount: 0 },
+        arrendamiento: { count: 0, totalValue: 0, financedAmount: 0 },
+        msi: { count: 0, totalValue: 0, financedAmount: 0 },
+      },
+    });
+    fixture.detectChanges();
+
+    expect(host.textContent).toContain('No hay solicitudes para el intervalo seleccionado.');
+    expect(host.textContent).toMatch(/MXN\s*0\.00/);
+  });
+
+  it('renders at most five frequent prospects and ten recent quotes', () => {
+    const fixture = TestBed.createComponent(DashboardPageComponent);
+    fixture.detectChanges();
+    const result = createMetrics();
+    result.frequentProspects = Array.from({ length: 8 }, (_, index) => ({
+      prospectId: `p${index}`,
+      fullName: `Prospecto ${index}`,
+      count: 8 - index,
+    }));
+    result.recentQuotes = Array.from({ length: 12 }, (_, index) => ({
+      id: `q${index}`,
+      savedAt: `2026-01-${String(index + 1).padStart(2, '0')}T12:00:00.000Z`,
+      prospectId: `p${index}`,
+      prospectName: `Prospecto reciente ${index}`,
+      type: 'msi',
+      totalValue: 100000,
+    }));
+
+    httpTesting.expectOne((req) => req.url === '/dashboard/metrics').flush(result);
+    fixture.detectChanges();
+    const host = fixture.nativeElement as HTMLElement;
+
+    expect(host.querySelectorAll('.prospect-list li').length).toBeLessThanOrEqual(5);
+    expect(host.querySelectorAll('.recent-list article').length).toBeLessThanOrEqual(10);
+  });
 });
 
 function createMetrics() {

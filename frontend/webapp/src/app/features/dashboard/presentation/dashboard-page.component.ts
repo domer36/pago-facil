@@ -83,8 +83,8 @@ export class DashboardPageComponent {
       .subscribe({
         next: (result) => {
           this.metrics.set(result);
-          this.frequentProspects.set(result.frequentProspects);
-          this.recentQuotes.set(result.recentQuotes);
+          this.frequentProspects.set(result.frequentProspects.slice(0, 5));
+          this.recentQuotes.set(result.recentQuotes.slice(0, 10));
           this.metricsLoading.set(false);
           this.listingsLoading.set(false);
         },
