@@ -1,0 +1,167 @@
+<header class="topbar" aria-label="Cabecera del dashboard">
+  <div class="topbar-inner">
+    <div class="brand-block">
+      <span class="brand-symbol" aria-hidden="true">P</span>
+      <span class="brand-mark">Pago Fácil</span>
+    </div>
+    <div class="product-block">Dashboard de métricas</div>
+    <a class="back-link" routerLink="/">Volver al cotizador</a>
+  </div>
+</header>
+
+<main class="dashboard-shell">
+  <header class="dashboard-header">
+    <div>
+      <p class="eyebrow">MÉTRICAS DE SOLICITUDES</p>
+      <h1>Resumen comercial</h1>
+      <p class="intro">Consulta cotizaciones guardadas y asociadas a prospectos.</p>
+    </div>
+    <div class="date-filter" aria-label="Filtro de fechas">
+      <label>
+        <span>Desde</span>
+        <input type="date" [ngModel]="from()" (ngModelChange)="from.set($event)" />
+      </label>
+      <label>
+        <span>Hasta</span>
+        <input type="date" [ngModel]="to()" (ngModelChange)="to.set($event)" />
+      </label>
+      <button type="button" [disabled]="metricsLoading()" (click)="load()">
+        {{ metricsLoading() ? 'Consultando…' : 'Consultar' }}
+      </button>
+    </div>
+  </header>
+
+  @if (metricsLoading()) {
+    <section class="loading-state" aria-live="polite">Cargando métricas…</section>
+  } @else if (metricsError()) {
+    <section class="error-state" role="alert">
+      <strong>No fue posible cargar las métricas.</strong>
+      <span>{{ metricsError() }}</span>
+    </section>
+  } @else if (metrics(); as result) {
+    @if (aggregateEmpty(result.total)) {
+      <section class="empty-state">No hay solicitudes para el intervalo seleccionado.</section>
+    }
+
+    <section class="summary-grid" aria-label="Resumen del intervalo">
+      <article>
+        <span>Solicitudes totales</span>
+        <strong>{{ formatCount(result.total.count) }}</strong>
+      </article>
+      <article>
+        <span>Valor total cotizado</span>
+        <strong>{{ result.total.totalValue | currency: 'MXN' : 'code' : '1.2-2' : 'es-MX' }}</strong>
+      </article>
+      <article>
+        <span>Monto financiado</span>
+        <strong>{{ result.total.financedAmount | currency: 'MXN' : 'code' : '1.2-2' : 'es-MX' }}</strong>
+      </article>
+    </section>
+
+    <section class="type-grid" aria-label="Métricas por tipo">
+      @for (item of types(); track item.key) {
+        <article class="type-card">
+          <h2>{{ item.label }}</h2>
+          <dl>
+            <div><dt>Solicitudes</dt><dd>{{ formatCount(item.aggregate.count) }}</dd></div>
+            <div><dt>Valor cotizado</dt><dd>{{ item.aggregate.totalValue | currency: 'MXN' : 'code' : '1.2-2' : 'es-MX' }}</dd></div>
+            <div><dt>Monto financiado</dt><dd>{{ item.aggregate.financedAmount | currency: 'MXN' : 'code' : '1.2-2' : 'es-MX' }}</dd></div>
+          </dl>
+        </article>
+      }
+    </section>
+
+    <section class="charts-grid" aria-label="Gráficas por tipo">
+      <article class="chart-card">
+        <div class="chart-heading">
+          <h2>Solicitudes por tipo</h2>
+          <span>Conteos exactos</span>
+        </div>
+        <div class="bars" role="img" aria-label="Solicitudes por tipo de financiamiento">
+          @for (item of types(); track item.key) {
+            <div class="bar-row" tabindex="0" [attr.aria-label]="item.label + ': ' + formatCount(item.aggregate.count) + ' solicitudes'">
+              <span class="bar-label">{{ item.label }}</span>
+              <div class="bar-track">
+                <span
+                  class="bar count-bar"
+                  [style.width.%]="item.aggregate.count ? (item.aggregate.count / (result.total.count || 1)) * 100 : 0"
+                ></span>
+              </div>
+              <strong>{{ formatCount(item.aggregate.count) }}</strong>
+            </div>
+          }
+        </div>
+      </article>
+
+      <article class="chart-card">
+        <div class="chart-heading">
+          <h2>Monto por tipo</h2>
+          <span>Valor y financiamiento</span>
+        </div>
+        <div class="bars" role="img" aria-label="Montos por tipo de financiamiento">
+          @for (item of types(); track item.key) {
+            <div class="bar-row" tabindex="0" [attr.aria-label]="item.label + ', valor cotizado: ' + (item.aggregate.totalValue | currency: 'MXN' : 'code' : '1.2-2' : 'es-MX') + ', monto financiado: ' + (item.aggregate.financedAmount | currency: 'MXN' : 'code' : '1.2-2' : 'es-MX')">
+              <span class="bar-label">{{ item.label }}</span>
+              <div class="bar-track stacked-track">
+                <span
+                  class="bar value-bar"
+                  [style.width.%]="item.aggregate.totalValue ? (item.aggregate.totalValue / (result.total.totalValue || 1)) * 100 : 0"
+                ></span>
+                <span
+                  class="bar financed-bar"
+                  [style.width.%]="item.aggregate.financedAmount ? (item.aggregate.financedAmount / (result.total.financedAmount || 1)) * 100 : 0"
+                ></span>
+              </div>
+              <strong>{{ item.aggregate.financedAmount | currency: 'MXN' : 'code' : '1.0-2' : 'es-MX' }}</strong>
+            </div>
+          }
+        </div>
+      </article>
+    </section>
+  }
+
+  <section class="listings-grid" aria-label="Listados independientes">
+    <article class="listing-card">
+      <div class="listing-heading">
+        <div><p class="eyebrow">ÚLTIMOS 30 DÍAS</p><h2>Prospectos frecuentes</h2></div>
+      </div>
+      @if (listingsLoading()) {
+        <p class="listing-state">Cargando prospectos…</p>
+      } @else if (listingsError()) {
+        <p class="error-inline" role="alert">{{ listingsError() }}</p>
+      } @else if (frequentProspects().length === 0) {
+        <p class="listing-state">No hay prospectos frecuentes en los últimos 30 días.</p>
+      } @else {
+        <ol class="prospect-list">
+          @for (prospect of frequentProspects(); track prospect.prospectId) {
+            <li><span>{{ prospect.fullName }}</span><strong>{{ formatCount(prospect.count) }} solicitudes</strong></li>
+          }
+        </ol>
+      }
+    </article>
+
+    <article class="listing-card">
+      <div class="listing-heading">
+        <div><p class="eyebrow">ACTIVIDAD RECIENTE</p><h2>Solicitudes recientes</h2></div>
+      </div>
+      @if (listingsLoading()) {
+        <p class="listing-state">Cargando solicitudes…</p>
+      } @else if (listingsError()) {
+        <p class="error-inline" role="alert">{{ listingsError() }}</p>
+      } @else if (recentQuotes().length === 0) {
+        <p class="listing-state">No hay solicitudes guardadas recientes.</p>
+      } @else {
+        <div class="recent-list">
+          @for (quote of recentQuotes(); track quote.id) {
+            <article>
+              <time [attr.datetime]="quote.savedAt">{{ quote.savedAt | date: 'd MMM y, HH:mm' : 'UTC' : 'es-MX' }}</time>
+              <strong>{{ quote.prospectName }}</strong>
+              <span>{{ financeLabel(quote.type) }}</span>
+              <b>{{ quote.totalValue | currency: 'MXN' : 'code' : '1.2-2' : 'es-MX' }}</b>
+            </article>
+          }
+        </div>
+      }
+    </article>
+  </section>
+</main>
