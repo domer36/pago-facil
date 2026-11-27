@@ -12,10 +12,11 @@ Covers: R1, R2, R3, R4, R5, R6, R7, R8, R9, R10, R11
 Completar la validación integrada del dashboard y del flujo existente. Las pruebas deben comprobar los datos persistidos, los límites por zona horaria, la presentación de estados y la ausencia de cambios en la cotización.
 
 ## To do
-- [x] Agregar o ajustar pruebas unitarias y e2e pertinentes al agregado backend y a la navegación frontend.
+- [x] Agregar o ajustar pruebas unitarias y e2e pertinentes al agregado backend y a la navegación frontend, incluidos el dashboard inicial y el botón hacia la ruta de creación.
 - [x] Preparar datos de prueba con cotizaciones guardadas de los tres tipos, asociadas y no asociadas a prospectos.
 - [x] Verificar intervalos en zona horaria de México y persistencia en UTC.
 - [x] Validar conteos, montos separados, listados, estados vacíos y errores desde la integración completa.
+- [x] Verificar que el microservicio dashboard arranca en Compose y responde por el proxy frontend sin 502.
 - [x] Confirmar que el flujo actual de creación y guardado de cotizaciones no se modifica.
 
 ## Test (acceptance criteria)
@@ -25,4 +26,5 @@ Completar la validación integrada del dashboard y del flujo existente. Las prue
 - [x] Las listas muestran como máximo cinco prospectos frecuentes y diez solicitudes recientes con todos los campos requeridos.
 - [x] Las cotizaciones no guardadas o sin prospecto no aparecen ni afectan los resultados.
 - [x] Los casos de carga, ausencia de datos y error se muestran en español y fallan de forma visible ante una regresión.
+- [x] La ruta inicial muestra el dashboard y su botón abre la ruta dedicada del cotizador.
 - [x] El flujo existente de cotización conserva su comportamiento y las pruebas pertinentes pasan.

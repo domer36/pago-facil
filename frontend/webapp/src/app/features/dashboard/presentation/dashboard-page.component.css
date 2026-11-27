@@ -5,7 +5,8 @@
 .brand-symbol { display: grid; width: 1.8rem; height: 1.8rem; place-items: center; border-radius: .55rem; background: #087764; color: white; font-weight: 800; transform: rotate(-7deg); }
 .brand-mark { color: #143b36; font-size: 1.25rem; font-weight: 800; }
 .product-block { margin-left: 1.25rem; color: #73827d; font-size: .82rem; font-weight: 700; }
-.back-link { margin-left: auto; color: #087764; font-size: .82rem; font-weight: 800; text-decoration: none; }
+.create-quote-link { margin-left: auto; padding: .65rem .9rem; border-radius: .6rem; background: #087764; color: white; font-size: .82rem; font-weight: 800; text-decoration: none; }
+.create-quote-link:hover, .create-quote-link:focus-visible { background: #065f51; }
 .dashboard-shell { width: min(1200px, calc(100% - 2rem)); margin: auto; padding: 2.5rem 0 4rem; }
 .dashboard-header { display: flex; align-items: flex-end; justify-content: space-between; gap: 1.5rem; margin-bottom: 1.5rem; }
 .eyebrow { margin: 0 0 .5rem; color: #167c69; font-size: .72rem; font-weight: 800; letter-spacing: .12em; }

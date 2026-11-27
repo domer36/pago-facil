@@ -29,6 +29,12 @@ describe('DashboardPageComponent', () => {
     const fixture = TestBed.createComponent(DashboardPageComponent);
     fixture.detectChanges();
 
+    const createQuoteLink = (fixture.nativeElement as HTMLElement).querySelector(
+      '.create-quote-link',
+    ) as HTMLAnchorElement;
+    expect(createQuoteLink.textContent?.trim()).toBe('Crear cotización');
+    expect(createQuoteLink.getAttribute('href')).toBe('/cotizador');
+
     const request = httpTesting.expectOne(
       (req) =>
         req.url === '/dashboard/metrics' &&
