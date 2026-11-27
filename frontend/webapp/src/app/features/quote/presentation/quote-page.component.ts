@@ -4,6 +4,7 @@ import localeEsMx from '@angular/common/locales/es-MX';
 import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { debounceTime } from 'rxjs';
 import type {
   Prospect,
@@ -18,7 +19,7 @@ import { DownloadQuotePdf } from '../application/download-quote-pdf.use-case';
 registerLocaleData(localeEsMx);
 
 @Component({
-  imports: [CurrencyPipe, ReactiveFormsModule],
+  imports: [CurrencyPipe, ReactiveFormsModule, RouterLink],
   selector: 'app-quote-page',
   styleUrl: './quote-page.component.css',
   templateUrl: './quote-page.component.html',

@@ -6,6 +6,8 @@ import { QUOTE_GATEWAY } from './features/quote/application/quote-gateway.port';
 import { HttpQuoteGateway } from './features/quote/infrastructure/http-quote.gateway';
 import { QUOTE_DOCUMENT_GATEWAY } from './features/quote/application/quote-document-gateway.port';
 import { HttpQuoteDocumentGateway } from './features/quote/infrastructure/http-quote-document.gateway';
+import { DASHBOARD_GATEWAY } from './features/dashboard/application/dashboard-gateway.port';
+import { HttpDashboardGateway } from './features/dashboard/infrastructure/http-dashboard.gateway';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -14,5 +16,6 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     { provide: QUOTE_GATEWAY, useClass: HttpQuoteGateway },
     { provide: QUOTE_DOCUMENT_GATEWAY, useClass: HttpQuoteDocumentGateway },
+    { provide: DASHBOARD_GATEWAY, useClass: HttpDashboardGateway },
   ],
 };
